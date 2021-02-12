@@ -1,25 +1,40 @@
 #include <string>
 #include "CustomHash.h"
+using std::string;
+
+
+// PRIVATE FUNCTIONS
+
+unsigned int CustomHash::str_to_int(const string& str){
+    unsigned int result = 0;
+    for (size_t i = 0; i < str.length(); i++)
+        result += str[i];
+    return int(result);
+};
+
+
+
+// PUBLIC FUNCTIONS
 
 CustomHash::CustomHash(){
 };
 
 
 
-int CustomHash::hash(const std::string * key){
+int CustomHash::hash(const string * key){
     return (int)&key % this->MAX_TABLE;
 };
 
 
 // PUT
-CustomHash & CustomHash::put(const std::string * key, std::string value){
+CustomHash & CustomHash::put(const string * key, string value){
     int hash_value = this->hash(key);
 
     return *this;
 };
 
 // GET
-std::string get(const std::string * key) {
+string get(const string * key) {
     value = ;
     return value;
 };

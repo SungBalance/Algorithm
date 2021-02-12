@@ -1,9 +1,11 @@
 #include <string>
 #include <vector>
+using std::string;
 
 struct bucket{
-    std::string key;
-    std::string value;
+    bool is_using;
+    string key;
+    string value;
 }
 
 class CustomHash{
@@ -12,7 +14,7 @@ class CustomHash{
         int hash_method{0};
         int MAX_TABLE{0};
         std::vector<int> KEY_TABLE{};
-        std::vector<std::string> VALUE_TABLE{};
+        std::vector<string> VALUE_TABLE{};
 
         // HASHING
         int division_method();
@@ -35,20 +37,20 @@ class CustomHash{
         CustomHash();
 
         // HASHING
-        int hash(const std::string * key);
+        int hash(const string * key);
 
         // PUT
-        CustomHash & put(const std::string * key, std::string value);
+        CustomHash & put(const string * key, string value);
 
         // GET
-        std::string get(const std::string * key) const;
+        string get(const string * key) const;
 
         // EDIT
         CustomHash & update();
 
         // remove
-        CustomHash & remove(const std::string * key);
-        CustomHash & remove(const std::string * key, const std::string * value);
+        CustomHash & remove(const string * key);
+        CustomHash & remove(const string * key, const string * value);
 
         void clear();
 
