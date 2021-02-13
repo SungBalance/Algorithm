@@ -1,11 +1,15 @@
 #include <string>
-#include <vector>
+#include <array>
 using std::string;
+using std::array;
 
+// https://gist.github.com/jorendorff/b6afda0f5ae670b8ebb3
+
+// for c++11, we can give init value to non-static member variables.
 struct bucket{
-    bool is_using;
-    string key;
-    string value;
+    bool is_using = false;
+    string key = "";
+    string value = "";
 }
 
 class CustomHash{
@@ -13,13 +17,15 @@ class CustomHash{
     private:
         int hash_method{0};
         int MAX_TABLE{0};
-        std::vector<int> KEY_TABLE{};
-        std::vector<string> VALUE_TABLE{};
+        unsigned int TABLE_SIZE{256};
+        array<bucket, 256> HASH_TABLE{};
 
         // HASHING
-        int division_method();
-        int multiplication_method();
-        int universal_hasing();
+        unsigned int str_to_int(const string & str);
+
+        unsigned int division_method();
+        unsigned int multiplication_method();
+        unsigned int universal_hasing();
 
 
         // Collision
@@ -37,7 +43,7 @@ class CustomHash{
         CustomHash();
 
         // HASHING
-        int hash(const string * key);
+        int hash(const string & key);
 
         // PUT
         CustomHash & put(const string * key, string value);

@@ -5,7 +5,7 @@ using std::string;
 
 // PRIVATE FUNCTIONS
 
-unsigned int CustomHash::str_to_int(const string& str){
+unsigned int CustomHash::str_to_int(const string & str){
     unsigned int result = 0;
     for (size_t i = 0; i < str.length(); i++)
         result += str[i];
@@ -17,17 +17,19 @@ unsigned int CustomHash::str_to_int(const string& str){
 // PUBLIC FUNCTIONS
 
 CustomHash::CustomHash(){
+    //
 };
 
 
 
-int CustomHash::hash(const string * key){
-    return (int)&key % this->MAX_TABLE;
+int CustomHash::hash(const string & key){
+    unsigned int hash_value = this->str_to_int(key) % this->TABLE_SIZE;
+    return hash_value
 };
 
 
 // PUT
-CustomHash & CustomHash::put(const string * key, string value){
+CustomHash & CustomHash::put(const string & key, string & value){
     int hash_value = this->hash(key);
 
     return *this;
