@@ -6,11 +6,12 @@ using std::array;
 // https://gist.github.com/jorendorff/b6afda0f5ae670b8ebb3
 
 // for c++11, we can give init value to non-static member variables.
+
 struct bucket{
     bool is_using = false;
-    string key = "";
-    string value = "";
-}
+    string key = NULL;
+    string value = NULL;
+};
 
 class CustomHash{
 
@@ -22,16 +23,24 @@ class CustomHash{
 
         // HASHING
         unsigned int str_to_int(const string & str);
+        unsigned int division_method(const string & str);
+        unsigned int multiplication_method(const string & str);
+        unsigned int universal_hasing(const string & str);
+        int hash(const string & key);
 
-        unsigned int division_method();
-        unsigned int multiplication_method();
-        unsigned int universal_hasing();
 
+        // get index to work per Collision methods
+        unsigned int linear_probing_put(const string & key);
+        unsigned int linear_probing_get(const string & key);
+        unsigned int linear_probing_remove(const string & key);
 
-        // Collision
-        void linear_probing(int _age, char* _name , double _height);
-        void quadratic_probing();
-        void double_hashing();
+        unsigned int quadratic_probing_put(const string & key);
+        unsigned int quadratic_probing_get(const string & key);
+        unsigned int quadratic_probing_remove(const string & key);
+
+        unsigned int double_hashing_put(const string & key);
+        unsigned int double_hashing_get(const string & key);
+        unsigned int double_hashing_remove(const string & key);
 
         // Extends
         void rehash();
@@ -42,29 +51,22 @@ class CustomHash{
         // CONSTRUCTOR
         CustomHash();
 
-        // HASHING
-        int hash(const string & key);
+        
 
         // PUT
         CustomHash & put(const string & key, string & value);
 
         // GET
-        string get(const string & key) const;
+        string get(const string & key);
 
         // EDIT
         CustomHash & update();
 
-        // remove
-        CustomHash & remove(const string * key);
-        CustomHash & remove(const string * key, const string * value);
+        // REMOVE
+        CustomHash & remove(const string & key);
+        CustomHash & remove(const string & key, const string & value);
 
         void clear();
-
-
-        int size();
-        
-        void keys();
-        void values();
 
 
 };
