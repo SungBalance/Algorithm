@@ -1,6 +1,11 @@
 #include <string>
+#include <vector>
+#include <iostream>
 #include "CustomHash.h"
+
 using std::string;
+using std::vector;
+using namespace std;
 
 /*
 ##
@@ -24,7 +29,7 @@ unsigned int CustomHash::division_method(const unsigned int & key_int, const uns
 
 unsigned int CustomHash::multiplication_method(const unsigned int & key_int, const unsigned int & size){
     // Knuth, "Sorting and Searching", v. 3 of "The Art of Computer Programming")
-    return int( size * ( (key_int * this->CONST_MULTIPLICATION_METHOD) % 1 ) );
+    return 0; // int( size * ( (key_int * this->CONST_MULTIPLICATION_METHOD) % 1 ) );
 };
 
 unsigned int CustomHash::universal_hasing(const unsigned int & key_int, const unsigned int & size){
@@ -277,6 +282,8 @@ CustomHash & CustomHash::put(const string & key, string & value){
     HASH_TABLE[index].key = key;
     HASH_TABLE[index].value = value;
 
+    this->INDEX_LIST.push_back(index);
+
     check_and_extend();
 
     return * this;
@@ -311,7 +318,43 @@ CustomHash & CustomHash::remove(const string & key, const string & value){
 
 // CLEAR
 void CustomHash::clear(){
+    this->HASH_TABLE = new bucket[TABLE_SIZE];
+};
 
+// SHOW
+
+vector<string> & CustomHash::get_keys(){
+    vector<string> key_list;
+
+    for( unsigned int i=0 ; i<this->HASH_TABLE ; i++){
+        if(this->HASH_TABLE[i].is_using == true){
+            key_list.push_back(this->HASH_TABLE[i].key);
+        }
+    };
+
+    return key_list;
+};
+
+vector<string> & CustomHash::get_values(){
+    vector<string> value_list;
+
+    for( unsigned int i=0 ; i<this->HASH_TABLE ; i++){
+        if(this->HASH_TABLE[i].is_using == true){
+            value_list.push_back(this->HASH_TABLE[i].value);
+        }
+    };
+
+    return value_list;
+};
+
+void CustomHash::print_list(){
+    vector<bucket> value_list;
+
+    for( unsigned int i=0 ; i<this->HASH_TABLE ; i++){
+        if(this->HASH_TABLE[i].is_using == true){
+            cout << this->HASH_TABLE[i].key << ":" << this->HASH_TABLE[i].value << endl;
+        }
+    };   
 };
 
 

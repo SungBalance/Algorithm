@@ -21,7 +21,7 @@ int main()
         cin >> selectProbe;
     }
 
-    //CustomHash *hashtable = new CustomHash(0, 0);
+    CustomHash *hashtable = new CustomHash(0, 0);
 
     cout << "-----------------------------------" << endl;
     cout << "HASH TABLE is created." << endl;
@@ -79,20 +79,16 @@ int main()
                 cout << "== 3: LIST ==" << endl;
                 key_input = "";
 
-                cout << "KEY를 입력하세요 :" << endl;
-                cin >> key_input;
-                cout << hashtable.remove(key_input) << endl;
+                
+
+                hashtable.print_list(key_input);
                 cout << "== remove completed ==" << endl;
                 break;
 
             case 4:
                 cout << "== 4: CLEAR ==" << endl;
-                key_input = "";
-
-                cout << "KEY를 입력하세요 :" << endl;
-                cin >> key_input;
-                cout << hashtable.remove(key_input) << endl;
-                cout << "== remove completed ==" << endl;
+                cout << hashtable.clear() << endl;
+                cout << "== clear completed ==" << endl;
                 break;
             
             case 5:

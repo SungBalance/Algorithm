@@ -1,10 +1,12 @@
 #include <string>
 #include <array>
+#include <vector>
 #include <functional>
 
 using std::string;
 using std::array;
 using std::function;
+using std::vector;
 
 // https://gist.github.com/jorendorff/b6afda0f5ae670b8ebb3
 
@@ -21,11 +23,12 @@ class CustomHash{
     private:
         // Knuth, "Sorting and Searching", v. 3 of "The Art of Computer Programming").
         const float CONST_MULTIPLICATION_METHOD{0.6180339887}; // (sqrt(5)-1)/2
+        const int limit_percent{75};
 
-        int hash_method{0};
-        int MAX_TABLE{0};
-        const unsigned int TABLE_SIZE{256};
+        unsigned int TABLE_SIZE{8};
         bucket HASH_TABLE[TABLE_SIZE]; // array<bucket, 256> HASH_TABLE{};
+
+        vector<unsigned int> INDEX_LIST;
 
         // FUNCTION POINTERS
         unsigned int (CustomHash::*HasingPointer)(const unsigned int & key_int, const unsigned int & size);
@@ -63,8 +66,6 @@ class CustomHash{
         // CONSTRUCTOR
         CustomHash(const int Hashing = 0, const int Collision = 0);
 
-        
-
         // PUT
         CustomHash & put(const string & key, string & value);
 
@@ -76,6 +77,11 @@ class CustomHash{
         CustomHash & remove(const string & key, const string & value);
 
         void clear();
+
+        vector<string> & get_keys();
+        vector<string> & get_values();
+
+        void print_list();
 
 
 };
