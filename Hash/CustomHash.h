@@ -17,8 +17,8 @@ class CustomHash{
     private:
         int hash_method{0};
         int MAX_TABLE{0};
-        unsigned int TABLE_SIZE{256};
-        array<bucket, 256> HASH_TABLE{};
+        const unsigned int TABLE_SIZE{256};
+        bucket HASH_TABLE[TABLE_SIZE]; // array<bucket, 256> HASH_TABLE{};
 
         // HASHING
         unsigned int str_to_int(const string & str);
@@ -46,10 +46,10 @@ class CustomHash{
         int hash(const string & key);
 
         // PUT
-        CustomHash & put(const string * key, string value);
+        CustomHash & put(const string & key, string & value);
 
         // GET
-        string get(const string * key) const;
+        string get(const string & key) const;
 
         // EDIT
         CustomHash & update();
