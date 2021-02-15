@@ -1,7 +1,116 @@
 #include <iostream>
+#include <CustomHash.h>
+
+using namespace std;
 
 int main()
 {
-    std::cout << "Hello code" << std::endl;
+    cout << "-----------------------------------" << endl;
+    int selectHash = -1;
+    while(selectHash != 0 && selectHash != 1){
+        cout << "HASH 종류를 선택하세요." << endl;
+        cout << "0: DIVISION(default)  |  1: MULTIPLICATION" << endl;
+        cin >> selectHash;
+    }
+    
+    int selectProbe = -1;
+    while(selectProbe != 0 && selectProbe != 1 && selectProbe != 2){
+        cout << "\n" << endl;
+        cout << "탐사 방법을 선택하세요." << endl;
+        cout << "0: LINEAR  |  1: QUADRATIC  |  2: DOUBLE HASHING" << endl;
+        cin >> selectProbe;
+    }
+
+    //CustomHash *hashtable = new CustomHash(0, 0);
+
+    cout << "-----------------------------------" << endl;
+    cout << "HASH TABLE is created." << endl;
+    cout << "-----------------------------------" << endl;
+    cout << "" << endl;
+    cout << "" << endl;
+
+
+    int selectWork = -1;
+    while(1){
+        cout << "-----------------------------------" << endl;
+        cout << "작업을 선택하세요." << endl;
+        cout << "|  0: PUT  |  1: GET  |  2: REMOVE  |  3:LIST  |  4:CLEAR  |  5:TEST  |" << endl;
+        
+        cin >> selectWork;
+        
+        string key_input = "";
+        string value_input = "";
+
+        switch(selectWork){
+            case 0:
+                cout << "== 0: PUT ==" << endl;
+                key_input = "";
+                value_input = "";
+
+                cout << "KEY를 입력하세요 :" << endl;
+                cin >> key_input;
+                cout << "VALUE를 입력하세요 :" << endl;
+                cin >> value_input;
+
+                hashtable.put(key_input, value_input);
+                cout << "== put completed ==" << endl;
+                break;
+
+            case 1:
+                cout << "== 1: GET ==" << endl;
+                key_input = "";
+
+                cout << "KEY를 입력하세요 :" << endl;
+                cin >> key_input;
+                cout << "   " << key_input << " :: " << hashtable.get(key_input) << endl;
+                break;
+
+            case 2:
+                cout << "== 2: REMOVE ==" << endl;
+                key_input = "";
+
+                cout << "KEY를 입력하세요 :" << endl;
+                cin >> key_input;
+                cout << hashtable.remove(key_input) << endl;
+                cout << "== remove completed ==" << endl;
+                break;
+
+            case 3:
+                cout << "== 3: LIST ==" << endl;
+                key_input = "";
+
+                cout << "KEY를 입력하세요 :" << endl;
+                cin >> key_input;
+                cout << hashtable.remove(key_input) << endl;
+                cout << "== remove completed ==" << endl;
+                break;
+
+            case 4:
+                cout << "== 4: CLEAR ==" << endl;
+                key_input = "";
+
+                cout << "KEY를 입력하세요 :" << endl;
+                cin >> key_input;
+                cout << hashtable.remove(key_input) << endl;
+                cout << "== remove completed ==" << endl;
+                break;
+            
+            case 5:
+                cout << "== 5: TEST ==" << endl;
+                key_input = "";
+
+                cout << "KEY를 입력하세요 :" << endl;
+                cin >> key_input;
+                cout << hashtable.remove(key_input) << endl;
+                cout << "== remove completed ==" << endl;
+                break;
+
+            default:
+                cout << ":::ERROR::: -> WRONG JOB." << endl;
+                break;
+        };
+
+    };
+
     return 0;
 }

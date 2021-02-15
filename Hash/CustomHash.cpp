@@ -17,23 +17,31 @@ unsigned int CustomHash::str_to_int(const string & str){
     return int(result);
 };
 
-unsigned int CustomHash::division_method(const string & str){
+// HASHING:: Methods
+unsigned int CustomHash::division_method(const unsigned int & key_int, const unsigned int & size){
+    return key_int % size;
+};
 
+unsigned int CustomHash::multiplication_method(const unsigned int & key_int, const unsigned int & size){
+    // Knuth, "Sorting and Searching", v. 3 of "The Art of Computer Programming")
+    return int( size * ( (key_int * this->CONST_MULTIPLICATION_METHOD) % 1 ) );
+};
+
+unsigned int CustomHash::universal_hasing(const unsigned int & key_int, const unsigned int & size){
+    //
     return 0;
 };
 
-unsigned int CustomHash::multiplication_method(const string & str){
+unsigned int CustomHash::hash(const string & key, const unsigned int size){
+    unsigned int hash_size{0};
 
-    return 0;
-};
+    if(size == 0){
+        hash_size = this->TABLE_SIZE;
+    } else {
+        hash_size = size;
+    }
 
-unsigned int CustomHash::universal_hasing(const string & str){
-
-    return 0;
-};
-
-int CustomHash::hash(const string & key){
-    unsigned int hash_value = this->str_to_int(key) % this->TABLE_SIZE;
+    unsigned int hash_value = (this->*HasingPointer)(str_to_int(key), hash_size);
     return hash_value;
 };
 
@@ -41,81 +49,162 @@ int CustomHash::hash(const string & key){
 
 // Collision:: Linear_probing
 unsigned int CustomHash::linear_probing_put(const string & key){
-
-    unsigned int index = this->hash(key);
-
-    while(this->HASH_TABLE[index].value != NULL){
-
+    unsigned int index = hash(key);
+    unsigned int index_end = index;
+    
+    do {
         // get index for new one
-        if(this->HASH_TABLE[index].is_using==false)
+        if(this->HASH_TABLE[index].is_using == false)
             return index;
         
         // get index for update
-        if(this->HASH_TABLE[index].key == key && this->HASH_TABLE[index].is_using==true)
+        if(this->HASH_TABLE[index].is_using == true && this->HASH_TABLE[index].key == key)
             return index;
 
-        index = index+1;
+        index = index + 1;
     
         index %= this->TABLE_SIZE; // warp around the TABLE
-    }
-
-    return NULL;
+    } while(index != index_end);
+    
 };
 
 unsigned int CustomHash::linear_probing_get(const string & key){
+    unsigned int index = hash(key);
+    unsigned int index_end = index;
 
-    unsigned int index = this->hash(key);
-
-    while(this->HASH_TABLE[index].value != NULL){
-        if(this->HASH_TABLE[index].is_using==true == this->HASH_TABLE[index].key == key)
+    do {
+        if(this->HASH_TABLE[index].is_using == true && this->HASH_TABLE[index].key == key){
             return index;
-
-        index = index+1;
+        }
+        
+        index = index + 1;
     
         index %= this->TABLE_SIZE; // warp around the TABLE
-    }
+    } while(index != index_end);
 
 };
 
 unsigned int CustomHash::linear_probing_remove(const string & key){
+    unsigned int hash_value = hash(key);
 
-    unsigned int index = this->hash(key);
+    unsigned int index = hash(key);
+    unsigned int index_end = index;
 
-    while(this->HASH_TABLE[index].key != key){
+    do {
         if(this->HASH_TABLE[index].key == key){
             return index;
         }
+        
+        index = index + 1;
 
-        index = index+1;
-    
         index %= this->TABLE_SIZE; // warp around the TABLE
-    }
+    } while(index != index_end);
 };
 
 
 // Collision:: Quadratic_probing
 unsigned int CustomHash::quadratic_probing_put(const string & key){
+    unsigned int index_current = hash(key);
+    unsigned int step = 0;
 
+    while(step < this->TABLE_SIZE){
+
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
+        
+        // get index for new one
+        if(this->HASH_TABLE[index_current].is_using == false)
+            return index_current;
+        
+        // get index for update
+        if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key)
+            return index_current;
+
+        step += 1;
+    }
 };
 
 unsigned int CustomHash::quadratic_probing_get(const string & key){
+    unsigned int index_current = hash(key);
+    unsigned int step = 0;
 
+    while(step < this->TABLE_SIZE){
+
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
+        
+        if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
+            return index_current;
+        }
+        
+        step += 1;
+    }
 };
 
 unsigned int CustomHash::quadratic_probing_remove(const string & key){
+    unsigned int index_current = hash(key);
+    unsigned int step = 0;
+    
+    while(step < this->TABLE_SIZE){
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
+        
+        if(this->HASH_TABLE[index_current].key == key){
+            return index_current;
+        }
 
+        step += 1;
+    }
 };
 
 // Collision:: Double_hashing
 unsigned int CustomHash::double_hashing_put(const string & key){
+    unsigned int index_current = hash(key);
+    unsigned int step = hash(key, this->TABLE_SIZE+1);
 
+    while(step < this->TABLE_SIZE){
+
+        index_current += step;
+        index_current %= this->TABLE_SIZE;
+        
+        // get index for new one
+        if(this->HASH_TABLE[index_current].is_using == false)
+            return index_current;
+        
+        // get index for update
+        if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
+            return index_current;
+        }
+    }
 };
 
 unsigned int CustomHash::double_hashing_get(const string & key){
+    unsigned int index_current = hash(key);
+    unsigned int step = hash(key, this->TABLE_SIZE+1);
 
+    while(step < this->TABLE_SIZE){
+
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
+        
+        if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
+            return index_current;
+        }
+    }
 };
-unsigned int CustomHash::double_hashing_remove(const string & key){
 
+unsigned int CustomHash::double_hashing_remove(const string & key){
+    unsigned int index_current = hash(key);
+    unsigned int step = hash(key, this->TABLE_SIZE+1);
+    
+    while(step < this->TABLE_SIZE){
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
+        
+        if(this->HASH_TABLE[index_current].key == key){
+            return index_current;
+        }
+    }
 };
 
 // Extends
@@ -128,7 +217,9 @@ void CustomHash::extend(){
 };
 
 void CustomHash::check_and_extend(){
-    
+    if (condition){
+        this->extend();
+    }
 };
 
 
@@ -140,32 +231,67 @@ void CustomHash::check_and_extend(){
 
 
 // Constructors
-CustomHash::CustomHash(){
-    //
+CustomHash::CustomHash( const int Hashing = 0, const int Collision = 0 ){
+
+    switch(Hashing){
+        case 1: // for multiplication method, we take power of 2 as table size
+            break;
+        
+        case 2:
+            break;
+
+        default: // for division method, we take prime number as table size
+            this->HasingPointer = division_method;
+            break;
+    }
+
+    switch(Collision){
+
+        case 1: // QUADRATIC
+            this->PutPointer = quadratic_probing_put;
+            this->GetPointer = quadratic_probing_get;
+            this->RemovePointer = quadratic_probing_remove;
+            break;
+
+        case 2: // DOUBLE HASHING
+            this->PutPointer = double_hashing_put;
+            this->GetPointer = double_hashing_get;
+            this->RemovePointer = double_hashing_remove;
+            break;
+
+        default: // LINEAR
+            this->PutPointer = linear_probing_put;
+            this->GetPointer = linear_probing_get;
+            this->RemovePointer = linear_probing_remove;
+            break;        
+    }
+        
 };
 
 
 // PUT
 CustomHash & CustomHash::put(const string & key, string & value){
-    unsigned int index = this->linear_probing_put(key); // get index to put data
+    unsigned int index = (this->*PutPointer)(key); // get index to put data
     
     HASH_TABLE[index].is_using = true;
     HASH_TABLE[index].key = key;
     HASH_TABLE[index].value = value;
+
+    check_and_extend();
 
     return * this;
 };
 
 // GET
 string CustomHash::get(const string & key){
-    unsigned int index = this->linear_probing_put(key); // get index to get data
+    unsigned int index = (this->*GetPointer)(key); // get index to get data
     
     return this->HASH_TABLE[index].value;
 };
 
 // REMOVE
 CustomHash & CustomHash::remove(const string & key){
-    unsigned int index = this->linear_probing_remove(key); // get index to remove data
+    unsigned int index = (this->*RemovePointer)(key); // get index to remove data
 
     this->HASH_TABLE[index].is_using = false; // this means remove
 
@@ -173,7 +299,7 @@ CustomHash & CustomHash::remove(const string & key){
 };
 
 CustomHash & CustomHash::remove(const string & key, const string & value){
-    unsigned int index = this->linear_probing_remove(key); // get index to remove data
+    unsigned int index = (this->*RemovePointer)(key); // get index to remove data
 
     // check if values equal
     if(this->HASH_TABLE[index].value == value){
