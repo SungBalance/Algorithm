@@ -54,56 +54,49 @@ unsigned int CustomHash::hash(const string & key, const unsigned int size){
 
 // Collision:: Linear_probing
 unsigned int CustomHash::linear_probing_put(const string & key){
-    unsigned int index = hash(key);
-    unsigned int index_end = index;
-    
-    do {
-        // get index for new one
-        if(this->HASH_TABLE[index].is_using == false)
-            return index;
-        
-        // get index for update
-        if(this->HASH_TABLE[index].is_using == true && this->HASH_TABLE[index].key == key)
-            return index;
+    unsigned int index_current = hash(key);
 
-        index = index + 1;
-    
-        index %= this->TABLE_SIZE; // warp around the TABLE
-    } while(index != index_end);
-    
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
+        if(this->HASH_TABLE[index_current].is_using == false){ // get index for new one
+            return index_current;
+        } else if(this->HASH_TABLE[index_current].key == key) { // get index for update
+            return index_current;
+        }
+
+        index_current += 1;
+        index_current %= this->TABLE_SIZE;
+    };
+    throw std::overflow_error("테이블이 꽉 찼습니다.");
 };
 
 unsigned int CustomHash::linear_probing_get(const string & key){
-    unsigned int index = hash(key);
-    unsigned int index_end = index;
+    unsigned int index_current = hash(key);
 
-    do {
-        if(this->HASH_TABLE[index].is_using == true && this->HASH_TABLE[index].key == key){
-            return index;
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){   
+
+        if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
+            return index_current;
         }
-        
-        index = index + 1;
-    
-        index %= this->TABLE_SIZE; // warp around the TABLE
-    } while(index != index_end);
 
+        index_current += 1;
+        index_current %= this->TABLE_SIZE;
+    }
+    throw "값을 찾을 수 없습니다.";
 };
 
 unsigned int CustomHash::linear_probing_remove(const string & key){
-    unsigned int hash_value = hash(key);
+    unsigned int index_current = hash(key);
 
-    unsigned int index = hash(key);
-    unsigned int index_end = index;
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
 
-    do {
-        if(this->HASH_TABLE[index].key == key){
-            return index;
+        if(this->HASH_TABLE[index_current].key == key){
+            return index_current;
         }
-        
-        index = index + 1;
 
-        index %= this->TABLE_SIZE; // warp around the TABLE
-    } while(index != index_end);
+        index_current += 1;
+        index_current %= this->TABLE_SIZE;
+    }
+    throw "값을 찾을 수 없습니다.";
 };
 
 
@@ -112,20 +105,17 @@ unsigned int CustomHash::quadratic_probing_put(const string & key){
     unsigned int index_current = hash(key);
     unsigned int step = 0;
 
-    while(step < this->TABLE_SIZE){
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
 
-        index_current += step^2;
-        index_current %= this->TABLE_SIZE;
-        
-        // get index for new one
-        if(this->HASH_TABLE[index_current].is_using == false)
+        if (this->HASH_TABLE[index_current].is_using == false){ // get index for new one
             return index_current;
-        
-        // get index for update
-        if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key)
+        } else if (this->HASH_TABLE[index_current].key == key){ // get index for update
             return index_current;
+        }
 
         step += 1;
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
     }
 };
 
@@ -133,16 +123,15 @@ unsigned int CustomHash::quadratic_probing_get(const string & key){
     unsigned int index_current = hash(key);
     unsigned int step = 0;
 
-    while(step < this->TABLE_SIZE){
-
-        index_current += step^2;
-        index_current %= this->TABLE_SIZE;
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
         
         if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
         
         step += 1;
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
     }
 };
 
@@ -150,15 +139,15 @@ unsigned int CustomHash::quadratic_probing_remove(const string & key){
     unsigned int index_current = hash(key);
     unsigned int step = 0;
     
-    while(step < this->TABLE_SIZE){
-        index_current += step^2;
-        index_current %= this->TABLE_SIZE;
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
         
         if(this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
 
         step += 1;
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
     }
 };
 
@@ -167,19 +156,16 @@ unsigned int CustomHash::double_hashing_put(const string & key){
     unsigned int index_current = hash(key);
     unsigned int step = hash(key, this->TABLE_SIZE+1);
 
-    while(step < this->TABLE_SIZE){
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
 
-        index_current += step;
-        index_current %= this->TABLE_SIZE;
-        
-        // get index for new one
-        if(this->HASH_TABLE[index_current].is_using == false)
+        if (this->HASH_TABLE[index_current].is_using == false){ // get index for new one
             return index_current;
-        
-        // get index for update
-        if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
+        } else if (this->HASH_TABLE[index_current].key == key){ // get index for update
             return index_current;
         }
+
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
     }
 };
 
@@ -187,14 +173,13 @@ unsigned int CustomHash::double_hashing_get(const string & key){
     unsigned int index_current = hash(key);
     unsigned int step = hash(key, this->TABLE_SIZE+1);
 
-    while(step < this->TABLE_SIZE){
-
-        index_current += step^2;
-        index_current %= this->TABLE_SIZE;
-        
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
         if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
+
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
     }
 };
 
@@ -202,13 +187,13 @@ unsigned int CustomHash::double_hashing_remove(const string & key){
     unsigned int index_current = hash(key);
     unsigned int step = hash(key, this->TABLE_SIZE+1);
     
-    while(step < this->TABLE_SIZE){
-        index_current += step^2;
-        index_current %= this->TABLE_SIZE;
-        
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){        
         if(this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
+
+        index_current += step^2;
+        index_current %= this->TABLE_SIZE;
     }
 };
 
@@ -218,11 +203,35 @@ void CustomHash::rehash(){
 };
 
 void CustomHash::extend(){
+    unsigned int TABLE_SIZE_OLD = this->TABLE_SIZE;
+    unsigned int VALUE_COUNT_OLD = this->VALUE_COUNT;
+    bucket * HASH_TABLE_OLD = this->HASH_TABLE;
 
+    this->TABLE_SIZE *= 2;
+    this->VALUE_COUNT = 0;
+    this->HASH_TABLE = new bucket[TABLE_SIZE];
+
+    for( unsigned int i=0 ; i<TABLE_SIZE_OLD ; i++){
+        if(HASH_TABLE_OLD[i].is_using == true){
+            this->put(HASH_TABLE_OLD[i].key, HASH_TABLE_OLD[i].value);
+            this->VALUE_COUNT += 1;
+        }
+    };
+
+    if(VALUE_COUNT_OLD != this->VALUE_COUNT){
+        
+        this->TABLE_SIZE = TABLE_SIZE_OLD;
+        this->VALUE_COUNT = VALUE_COUNT_OLD;
+        this->HASH_TABLE = HASH_TABLE_OLD;
+
+        throw "FAIL!!::EXTEND";
+    }
+
+    delete[] HASH_TABLE_OLD;
 };
 
 void CustomHash::check_and_extend(){
-    if (condition){
+    if (int(100*this->VALUE_COUNT/this->TABLE_SIZE) >= this->LIMIT_PERCENT){
         this->extend();
     }
 };
@@ -237,6 +246,9 @@ void CustomHash::check_and_extend(){
 
 // Constructors
 CustomHash::CustomHash( const int Hashing = 0, const int Collision = 0 ){
+    
+    // initialize table
+    this->HASH_TABLE = new bucket[this->TABLE_SIZE];
 
     switch(Hashing){
         case 1: // for multiplication method, we take power of 2 as table size
@@ -273,6 +285,10 @@ CustomHash::CustomHash( const int Hashing = 0, const int Collision = 0 ){
         
 };
 
+CustomHash::~CustomHash(){
+    delete[] this->HASH_TABLE;
+}
+
 
 // PUT
 CustomHash & CustomHash::put(const string & key, string & value){
@@ -283,6 +299,7 @@ CustomHash & CustomHash::put(const string & key, string & value){
     HASH_TABLE[index].value = value;
 
     this->INDEX_LIST.push_back(index);
+    this->VALUE_COUNT += 1;
 
     check_and_extend();
 
@@ -326,7 +343,7 @@ void CustomHash::clear(){
 vector<string> & CustomHash::get_keys(){
     vector<string> key_list;
 
-    for( unsigned int i=0 ; i<this->HASH_TABLE ; i++){
+    for( unsigned int i=0 ; i<this->TABLE_SIZE ; i++){
         if(this->HASH_TABLE[i].is_using == true){
             key_list.push_back(this->HASH_TABLE[i].key);
         }
@@ -338,7 +355,7 @@ vector<string> & CustomHash::get_keys(){
 vector<string> & CustomHash::get_values(){
     vector<string> value_list;
 
-    for( unsigned int i=0 ; i<this->HASH_TABLE ; i++){
+    for( unsigned int i=0 ; i<this->TABLE_SIZE ; i++){
         if(this->HASH_TABLE[i].is_using == true){
             value_list.push_back(this->HASH_TABLE[i].value);
         }
@@ -350,7 +367,7 @@ vector<string> & CustomHash::get_values(){
 void CustomHash::print_list(){
     vector<bucket> value_list;
 
-    for( unsigned int i=0 ; i<this->HASH_TABLE ; i++){
+    for( unsigned int i=0 ; i<this->TABLE_SIZE ; i++){
         if(this->HASH_TABLE[i].is_using == true){
             cout << this->HASH_TABLE[i].key << ":" << this->HASH_TABLE[i].value << endl;
         }

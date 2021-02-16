@@ -1,5 +1,5 @@
 #include <iostream>
-#include <CustomHash.h>
+#include "CustomHash.h"
 
 using namespace std;
 
@@ -22,6 +22,7 @@ int main()
     }
 
     CustomHash *hashtable = new CustomHash(0, 0);
+    //CustomHash hashtable(0,0);
 
     cout << "-----------------------------------" << endl;
     cout << "HASH TABLE is created." << endl;
@@ -52,7 +53,7 @@ int main()
                 cout << "VALUE를 입력하세요 :" << endl;
                 cin >> value_input;
 
-                hashtable.put(key_input, value_input);
+                hashtable->put(key_input, value_input);
                 cout << "== put completed ==" << endl;
                 break;
 
@@ -62,7 +63,7 @@ int main()
 
                 cout << "KEY를 입력하세요 :" << endl;
                 cin >> key_input;
-                cout << "   " << key_input << " :: " << hashtable.get(key_input) << endl;
+                cout << "   " << key_input << " :: " << hashtable->get(key_input) << endl;
                 break;
 
             case 2:
@@ -71,34 +72,27 @@ int main()
 
                 cout << "KEY를 입력하세요 :" << endl;
                 cin >> key_input;
-                cout << hashtable.remove(key_input) << endl;
+                hashtable->remove(key_input);
                 cout << "== remove completed ==" << endl;
                 break;
 
             case 3:
                 cout << "== 3: LIST ==" << endl;
                 key_input = "";
-
-                
-
-                hashtable.print_list(key_input);
+                hashtable->print_list();
                 cout << "== remove completed ==" << endl;
                 break;
 
             case 4:
                 cout << "== 4: CLEAR ==" << endl;
-                cout << hashtable.clear() << endl;
+                hashtable->clear();
                 cout << "== clear completed ==" << endl;
                 break;
             
             case 5:
                 cout << "== 5: TEST ==" << endl;
                 key_input = "";
-
-                cout << "KEY를 입력하세요 :" << endl;
-                cin >> key_input;
-                cout << hashtable.remove(key_input) << endl;
-                cout << "== remove completed ==" << endl;
+                cout << "== test completed ==" << endl;
                 break;
 
             default:

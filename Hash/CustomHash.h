@@ -23,10 +23,12 @@ class CustomHash{
     private:
         // Knuth, "Sorting and Searching", v. 3 of "The Art of Computer Programming").
         const float CONST_MULTIPLICATION_METHOD{0.6180339887}; // (sqrt(5)-1)/2
-        const int limit_percent{75};
-
+        const int LIMIT_PERCENT{75};
+        
+        bucket * HASH_TABLE;
         unsigned int TABLE_SIZE{8};
-        bucket HASH_TABLE[TABLE_SIZE]; // array<bucket, 256> HASH_TABLE{};
+        unsigned int VALUE_COUNT{0};
+        // bucket HASH_TABLE[TABLE_SIZE]; // array<bucket, 256> HASH_TABLE{};
 
         vector<unsigned int> INDEX_LIST;
 
@@ -65,6 +67,7 @@ class CustomHash{
     public:
         // CONSTRUCTOR
         CustomHash(const int Hashing = 0, const int Collision = 0);
+        ~CustomHash();
 
         // PUT
         CustomHash & put(const string & key, string & value);
