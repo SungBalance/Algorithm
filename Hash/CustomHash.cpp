@@ -13,7 +13,6 @@ using namespace std;
 ##
 */
 
-
 // HASHING
 unsigned int CustomHash::str_to_int(const string & str){
     unsigned int result = 0;
@@ -66,7 +65,7 @@ unsigned int CustomHash::linear_probing_put(const string & key){
         index_current += 1;
         index_current %= this->TABLE_SIZE;
     };
-    throw std::overflow_error("테이블이 꽉 찼습니다.");
+    throw "테이블이 꽉 찼습니다.";
 };
 
 unsigned int CustomHash::linear_probing_get(const string & key){
@@ -81,7 +80,7 @@ unsigned int CustomHash::linear_probing_get(const string & key){
         index_current += 1;
         index_current %= this->TABLE_SIZE;
     }
-    throw "값을 찾을 수 없습니다.";
+    throw "키 값을 찾을 수 없습니다.";
 };
 
 unsigned int CustomHash::linear_probing_remove(const string & key){
@@ -117,6 +116,7 @@ unsigned int CustomHash::quadratic_probing_put(const string & key){
         index_current += step^2;
         index_current %= this->TABLE_SIZE;
     }
+    throw "테이블이 꽉 찼습니다.";
 };
 
 unsigned int CustomHash::quadratic_probing_get(const string & key){
@@ -133,6 +133,7 @@ unsigned int CustomHash::quadratic_probing_get(const string & key){
         index_current += step^2;
         index_current %= this->TABLE_SIZE;
     }
+    throw "키 값을 찾을 수 없습니다.";
 };
 
 unsigned int CustomHash::quadratic_probing_remove(const string & key){
@@ -149,6 +150,7 @@ unsigned int CustomHash::quadratic_probing_remove(const string & key){
         index_current += step^2;
         index_current %= this->TABLE_SIZE;
     }
+    throw "값을 찾을 수 없습니다.";
 };
 
 // Collision:: Double_hashing
@@ -167,6 +169,7 @@ unsigned int CustomHash::double_hashing_put(const string & key){
         index_current += step^2;
         index_current %= this->TABLE_SIZE;
     }
+    throw "테이블이 꽉 찼습니다.";
 };
 
 unsigned int CustomHash::double_hashing_get(const string & key){
@@ -181,6 +184,7 @@ unsigned int CustomHash::double_hashing_get(const string & key){
         index_current += step^2;
         index_current %= this->TABLE_SIZE;
     }
+    throw "키 값을 찾을 수 없습니다.";
 };
 
 unsigned int CustomHash::double_hashing_remove(const string & key){
@@ -195,6 +199,7 @@ unsigned int CustomHash::double_hashing_remove(const string & key){
         index_current += step^2;
         index_current %= this->TABLE_SIZE;
     }
+    throw "값을 찾을 수 없습니다.";
 };
 
 // Extends
@@ -245,8 +250,7 @@ void CustomHash::check_and_extend(){
 
 
 // Constructors
-CustomHash::CustomHash( const int Hashing = 0, const int Collision = 0 ){
-    
+CustomHash::CustomHash( const int Hashing, const int Collision){
     // initialize table
     this->HASH_TABLE = new bucket[this->TABLE_SIZE];
 
@@ -258,28 +262,28 @@ CustomHash::CustomHash( const int Hashing = 0, const int Collision = 0 ){
             break;
 
         default: // for division method, we take prime number as table size
-            this->HasingPointer = division_method;
+            this->HasingPointer = &CustomHash::division_method;
             break;
     }
 
     switch(Collision){
 
         case 1: // QUADRATIC
-            this->PutPointer = quadratic_probing_put;
-            this->GetPointer = quadratic_probing_get;
-            this->RemovePointer = quadratic_probing_remove;
+            this->PutPointer = &CustomHash::quadratic_probing_put;
+            this->GetPointer = &CustomHash::quadratic_probing_get;
+            this->RemovePointer = &CustomHash::quadratic_probing_remove;
             break;
 
         case 2: // DOUBLE HASHING
-            this->PutPointer = double_hashing_put;
-            this->GetPointer = double_hashing_get;
-            this->RemovePointer = double_hashing_remove;
+            this->PutPointer = &CustomHash::double_hashing_put;
+            this->GetPointer = &CustomHash::double_hashing_get;
+            this->RemovePointer = &CustomHash::double_hashing_remove;
             break;
 
         default: // LINEAR
-            this->PutPointer = linear_probing_put;
-            this->GetPointer = linear_probing_get;
-            this->RemovePointer = linear_probing_remove;
+            this->PutPointer = &CustomHash::linear_probing_put;
+            this->GetPointer = &CustomHash::linear_probing_get;
+            this->RemovePointer = &CustomHash::linear_probing_remove;
             break;        
     }
         
@@ -308,9 +312,13 @@ CustomHash & CustomHash::put(const string & key, string & value){
 
 // GET
 string CustomHash::get(const string & key){
-    unsigned int index = (this->*GetPointer)(key); // get index to get data
-    
-    return this->HASH_TABLE[index].value;
+    try{
+        unsigned int index = (this->*GetPointer)(key); // get index to get data
+        return this->HASH_TABLE[index].value;
+    }
+    catch(int expn){//throw에서 보낸 b를 인자를 expn으로 받는다.
+        cout << "ERROR::GET:: " << expn << endl;
+    }
 };
 
 // REMOVE
@@ -335,12 +343,13 @@ CustomHash & CustomHash::remove(const string & key, const string & value){
 
 // CLEAR
 void CustomHash::clear(){
+    delete[] this->HASH_TABLE;
     this->HASH_TABLE = new bucket[TABLE_SIZE];
 };
 
 // SHOW
 
-vector<string> & CustomHash::get_keys(){
+vector<string> CustomHash::get_keys(){
     vector<string> key_list;
 
     for( unsigned int i=0 ; i<this->TABLE_SIZE ; i++){
@@ -352,7 +361,7 @@ vector<string> & CustomHash::get_keys(){
     return key_list;
 };
 
-vector<string> & CustomHash::get_values(){
+vector<string> CustomHash::get_values(){
     vector<string> value_list;
 
     for( unsigned int i=0 ; i<this->TABLE_SIZE ; i++){

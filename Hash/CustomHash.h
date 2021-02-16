@@ -14,8 +14,8 @@ using std::vector;
 
 struct bucket{
     bool is_using = false;
-    string key = NULL;
-    string value = NULL;
+    string key = "";
+    string value = "";
 };
 
 class CustomHash{
@@ -33,10 +33,10 @@ class CustomHash{
         vector<unsigned int> INDEX_LIST;
 
         // FUNCTION POINTERS
-        unsigned int (CustomHash::*HasingPointer)(const unsigned int & key_int, const unsigned int & size);
-        unsigned int (CustomHash::*PutPointer)(const string & key);
-        unsigned int (CustomHash::*GetPointer)(const string & key);
-        unsigned int (CustomHash::*RemovePointer)(const string & key);
+        unsigned int (CustomHash::*HasingPointer)(const unsigned int &, const unsigned int &);
+        unsigned int (CustomHash::*PutPointer)(const string &);
+        unsigned int (CustomHash::*GetPointer)(const string &);
+        unsigned int (CustomHash::*RemovePointer)(const string &);
 
         // HASHING
         unsigned int str_to_int(const string & str);
@@ -81,8 +81,8 @@ class CustomHash{
 
         void clear();
 
-        vector<string> & get_keys();
-        vector<string> & get_values();
+        vector<string> get_keys();
+        vector<string> get_values();
 
         void print_list();
 
