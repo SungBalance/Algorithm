@@ -60,9 +60,8 @@ class CustomHash{
         unsigned int double_hashing_remove(const string & key);
 
         // Extends
-        void rehash();
-        void extend();
-        void check_and_extend();
+        void extend(bool print_option = false);
+        void check_and_extend(bool print_option = false);
 
     public:
         // CONSTRUCTOR
@@ -70,21 +69,30 @@ class CustomHash{
         ~CustomHash();
 
         // PUT
-        CustomHash & put(const string & key, string & value);
+        CustomHash & put(const string key, const string value, bool extend_print = false);
+        CustomHash & put(const int key, const int value, bool extend_print = false);
+        CustomHash & put(const int key, const string value, bool extend_print = false);
 
         // GET
-        string get(const string & key);
+        string get(const string key);
+        string get(const int key);
 
         // REMOVE
-        CustomHash & remove(const string & key);
-        CustomHash & remove(const string & key, const string & value);
+        CustomHash & remove(const string key);
+        CustomHash & remove(const string key, const string value);
+        CustomHash & remove(const int key);
+        CustomHash & remove(const int key, const int value);
+        CustomHash & remove(const int key, const string value);
 
         void clear();
 
+        unsigned int get_size();
+        unsigned int get_element_count();
         vector<string> get_keys();
         vector<string> get_values();
 
         void print_list();
+        void print_list_all();
 
 
 };

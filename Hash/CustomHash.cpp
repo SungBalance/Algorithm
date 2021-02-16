@@ -66,6 +66,7 @@ unsigned int CustomHash::linear_probing_put(const string & key){
         index_current %= this->TABLE_SIZE;
     };
     throw "테이블이 꽉 찼습니다.";
+    return 0;
 };
 
 unsigned int CustomHash::linear_probing_get(const string & key){
@@ -81,6 +82,7 @@ unsigned int CustomHash::linear_probing_get(const string & key){
         index_current %= this->TABLE_SIZE;
     }
     throw "키 값을 찾을 수 없습니다.";
+    return 0;
 };
 
 unsigned int CustomHash::linear_probing_remove(const string & key){
@@ -96,6 +98,7 @@ unsigned int CustomHash::linear_probing_remove(const string & key){
         index_current %= this->TABLE_SIZE;
     }
     throw "값을 찾을 수 없습니다.";
+    return 0;
 };
 
 
@@ -117,6 +120,7 @@ unsigned int CustomHash::quadratic_probing_put(const string & key){
         index_current %= this->TABLE_SIZE;
     }
     throw "테이블이 꽉 찼습니다.";
+    return 0;
 };
 
 unsigned int CustomHash::quadratic_probing_get(const string & key){
@@ -133,7 +137,9 @@ unsigned int CustomHash::quadratic_probing_get(const string & key){
         index_current += step^2;
         index_current %= this->TABLE_SIZE;
     }
+
     throw "키 값을 찾을 수 없습니다.";
+    return 0;
 };
 
 unsigned int CustomHash::quadratic_probing_remove(const string & key){
@@ -151,12 +157,13 @@ unsigned int CustomHash::quadratic_probing_remove(const string & key){
         index_current %= this->TABLE_SIZE;
     }
     throw "값을 찾을 수 없습니다.";
+    return 0;
 };
 
 // Collision:: Double_hashing
 unsigned int CustomHash::double_hashing_put(const string & key){
     unsigned int index_current = hash(key);
-    unsigned int step = hash(key, this->TABLE_SIZE+1);
+    unsigned int step = hash(key, this->TABLE_SIZE-1);
 
     for(int i=0 ; i<this->TABLE_SIZE ; i++){
 
@@ -170,11 +177,12 @@ unsigned int CustomHash::double_hashing_put(const string & key){
         index_current %= this->TABLE_SIZE;
     }
     throw "테이블이 꽉 찼습니다.";
+    return 0;
 };
 
 unsigned int CustomHash::double_hashing_get(const string & key){
     unsigned int index_current = hash(key);
-    unsigned int step = hash(key, this->TABLE_SIZE+1);
+    unsigned int step = hash(key, this->TABLE_SIZE-1);
 
     for(int i=0 ; i<this->TABLE_SIZE ; i++){
         if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
@@ -185,11 +193,12 @@ unsigned int CustomHash::double_hashing_get(const string & key){
         index_current %= this->TABLE_SIZE;
     }
     throw "키 값을 찾을 수 없습니다.";
+    return 0;
 };
 
 unsigned int CustomHash::double_hashing_remove(const string & key){
     unsigned int index_current = hash(key);
-    unsigned int step = hash(key, this->TABLE_SIZE+1);
+    unsigned int step = hash(key, this->TABLE_SIZE-1);
     
     for(int i=0 ; i<this->TABLE_SIZE ; i++){        
         if(this->HASH_TABLE[index_current].key == key){
@@ -200,14 +209,11 @@ unsigned int CustomHash::double_hashing_remove(const string & key){
         index_current %= this->TABLE_SIZE;
     }
     throw "값을 찾을 수 없습니다.";
+    return 0;
 };
 
 // Extends
-void CustomHash::rehash(){
-    
-};
-
-void CustomHash::extend(){
+void CustomHash::extend(bool print_option){
     unsigned int TABLE_SIZE_OLD = this->TABLE_SIZE;
     unsigned int VALUE_COUNT_OLD = this->VALUE_COUNT;
     bucket * HASH_TABLE_OLD = this->HASH_TABLE;
@@ -215,16 +221,18 @@ void CustomHash::extend(){
     this->TABLE_SIZE *= 2;
     this->VALUE_COUNT = 0;
     this->HASH_TABLE = new bucket[TABLE_SIZE];
-
-    for( unsigned int i=0 ; i<TABLE_SIZE_OLD ; i++){
-        if(HASH_TABLE_OLD[i].is_using == true){
+    
+    if(print_option){
+        cout << "REHASH:: from " << TABLE_SIZE_OLD << " to " << this->TABLE_SIZE << endl;
+    }
+    
+    for(signed int i=0 ; i<TABLE_SIZE_OLD ; i++){
+        if(HASH_TABLE_OLD[i].is_using){
             this->put(HASH_TABLE_OLD[i].key, HASH_TABLE_OLD[i].value);
-            this->VALUE_COUNT += 1;
         }
     };
 
     if(VALUE_COUNT_OLD != this->VALUE_COUNT){
-        
         this->TABLE_SIZE = TABLE_SIZE_OLD;
         this->VALUE_COUNT = VALUE_COUNT_OLD;
         this->HASH_TABLE = HASH_TABLE_OLD;
@@ -235,9 +243,15 @@ void CustomHash::extend(){
     delete[] HASH_TABLE_OLD;
 };
 
-void CustomHash::check_and_extend(){
+void CustomHash::check_and_extend(bool print_option){
     if (int(100*this->VALUE_COUNT/this->TABLE_SIZE) >= this->LIMIT_PERCENT){
-        this->extend();
+        // this->extend();
+        
+        try{
+            this->extend(print_option);
+        } catch (string expn){
+            cout << "ERROR::EXTEND:: " << expn << endl;
+        }
     }
 };
 
@@ -295,59 +309,111 @@ CustomHash::~CustomHash(){
 
 
 // PUT
-CustomHash & CustomHash::put(const string & key, string & value){
-    unsigned int index = (this->*PutPointer)(key); // get index to put data
+CustomHash & CustomHash::put(const string key, string value, bool extend_print){
+    try{
+        unsigned int index = (this->*PutPointer)(key); // get index to put data
+        
+        if(HASH_TABLE[index].key != key){
+            this->VALUE_COUNT += 1;
+        }    
+        
+        HASH_TABLE[index].is_using = true;
+        HASH_TABLE[index].key = key;
+        HASH_TABLE[index].value = value;
+
+        
+
+    } catch(string expn) {
+        cout << "ERROR::put:: " << expn << endl;
+    }
     
-    HASH_TABLE[index].is_using = true;
-    HASH_TABLE[index].key = key;
-    HASH_TABLE[index].value = value;
-
-    this->INDEX_LIST.push_back(index);
-    this->VALUE_COUNT += 1;
-
-    check_and_extend();
-
+    check_and_extend(extend_print);
     return * this;
 };
 
+CustomHash & CustomHash::put(const int key, int value, bool extend_print){
+    string key_string = to_string(key);
+    string value_string = to_string(value);
+    this->put(key_string, value_string, extend_print);
+};
+
+
+CustomHash & CustomHash::put(const int key, string value, bool extend_print){
+    string key_string = to_string(key);
+    this->put(key_string, value, extend_print);
+};
+
 // GET
-string CustomHash::get(const string & key){
+string CustomHash::get(const string key){
     try{
         unsigned int index = (this->*GetPointer)(key); // get index to get data
         return this->HASH_TABLE[index].value;
     }
-    catch(int expn){//throw에서 보낸 b를 인자를 expn으로 받는다.
+    catch(string expn){
         cout << "ERROR::GET:: " << expn << endl;
     }
 };
 
+string CustomHash::get(const int key){
+    string key_string = to_string(key);
+    this->get(key_string);
+};
+
 // REMOVE
-CustomHash & CustomHash::remove(const string & key){
+CustomHash & CustomHash::remove(const string key){
     unsigned int index = (this->*RemovePointer)(key); // get index to remove data
 
     this->HASH_TABLE[index].is_using = false; // this means remove
+    this->VALUE_COUNT -= 1;
 
     return * this;
 };
 
-CustomHash & CustomHash::remove(const string & key, const string & value){
+CustomHash & CustomHash::remove(const string key, const string value){
     unsigned int index = (this->*RemovePointer)(key); // get index to remove data
 
     // check if values equal
     if(this->HASH_TABLE[index].value == value){
-        this->HASH_TABLE[index].is_using = false; // this means remove
+        this->HASH_TABLE[index].is_using = false;
+        this->VALUE_COUNT -= 1;
     }
-
-    return * this;
 };
+
+CustomHash & CustomHash::remove(const int key){
+    string key_string = to_string(key);
+    this->remove(key_string);
+};
+
+CustomHash & CustomHash::remove(const int key, const int value){
+    string key_string = to_string(key);
+    string value_string = to_string(value);
+    this->remove(key_string, value_string);
+};
+
+CustomHash & CustomHash::remove(const int key, const string value){
+    string key_string = to_string(key);
+    this->remove(key_string, value);
+};
+
 
 // CLEAR
 void CustomHash::clear(){
     delete[] this->HASH_TABLE;
+    this->VALUE_COUNT = 0;
+    this->TABLE_SIZE = 8;
     this->HASH_TABLE = new bucket[TABLE_SIZE];
 };
 
 // SHOW
+
+unsigned int CustomHash::get_size(){
+    return this->TABLE_SIZE;
+};
+
+unsigned int CustomHash::get_element_count(){
+    return this->VALUE_COUNT;
+};
+
 
 vector<string> CustomHash::get_keys(){
     vector<string> key_list;
@@ -380,6 +446,14 @@ void CustomHash::print_list(){
         if(this->HASH_TABLE[i].is_using == true){
             cout << this->HASH_TABLE[i].key << ":" << this->HASH_TABLE[i].value << endl;
         }
+    };   
+};
+
+void CustomHash::print_list_all(){
+    vector<bucket> value_list;
+
+    for( unsigned int i=0 ; i<this->TABLE_SIZE ; i++){
+        cout << this->HASH_TABLE[i].is_using << ":" << this->HASH_TABLE[i].key << ":" << this->HASH_TABLE[i].value << endl;
     };   
 };
 

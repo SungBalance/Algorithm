@@ -3,8 +3,7 @@
 
 using namespace std;
 
-int main()
-{
+void test_one_hash(){
     cout << "-----------------------------------" << endl;
     
     int selectHash = -1;
@@ -33,22 +32,31 @@ int main()
     int selectWork = -1;
 
     while(1){
-        cout << "\x1B[2J\x1B[H";
-        hashtable->print_list();
+        selectWork = -1;
+        cout << "\n\n\n\n\n\n\n\n";
+        
+        cout << "size: " << hashtable->get_size() << endl;
+        cout << "element: " << hashtable->get_element_count() << endl;
+        //hashtable->print_list_all();
+
+
         cout << "-----------------------------------" << endl;
         cout << "작업을 선택하세요." << endl;
         cout << "|  0: PUT  |  1: GET  |  2: REMOVE  |  3:LIST  |  4:CLEAR  |  5:TEST  |" << endl;
+        
         
         cin >> selectWork;
         
         string key_input = "";
         string value_input = "";
 
+        unsigned int test_count;
+        clock_t start, end;
+
         switch(selectWork){
             case 0:
                 cout << "-----------------------------------" << endl;
                 //cout << "== 0: PUT ==" << endl;
-                key_input = "";
                 value_input = "";
 
                 cout << "KEY를 입력하세요: ";
@@ -102,16 +110,93 @@ int main()
             case 5:
                 cout << "-----------------------------------" << endl;
                 cout << "== 5: TEST ==" << endl;
-                key_input = "";
+                
+                cout << "TEST할 put 수를 입력하세요(단위:1000): ";
+
+                cin >> test_count;
+
+                start = clock();
+                
+                for( unsigned int i=0 ; i < test_count*1000 ; i++){
+                    hashtable->put(i, i, true);
+                };
+
+                end = clock();
+                
+                cout << test_count*1000 << " puts with " << ((float) end - start)/CLOCKS_PER_SEC << "s" << endl;
+
                 cout << "== test completed ==" << endl;
                 break;
 
             default:
                 cout << ":::ERROR::: -> WRONG JOB." << endl;
+                key_input = "";
                 break;
         };
-        selectWork = -1;
     };
+}
+
+void auto_test(){
+
+    int test_count;
+    clock_t start, end;
+
+    cout << "TEST할 put 수를 입력하세요: ";
+    cin >> test_count;
+
+    for(int i=0 ; i<=2 ; i++){
+        CustomHash *hashtable = new CustomHash(0, i);
+        cout << "" << endl;
+        cout << "" << endl;
+        switch(i){
+            case 1: // QUADRATIC
+                cout << "QUADRATIC PROBING" << endl;
+                break;
+
+            case 2: // DOUBLE HASHING
+                cout << "DOUBLE HASHING" << endl;
+                break;
+
+            default: // LINEAR
+                cout << "LINEAR PROBING" << endl;
+                break;        
+        }
+
+        start = clock();
+                
+        for( unsigned int j=0 ; j < test_count ; j++){
+            hashtable->put(j, j);
+        };
+
+        end = clock();
+        cout << "for " << test_count << " puts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s" << endl;
+        
+        delete hashtable;
+    }
+}
+
+int main(){
+
+    int selectWork = -1;
+
+    while(selectWork != 0 && selectWork != 1){
+        cout << "\n" << endl;
+        cout << "작업을 선택하세요." << endl;
+        cout << "0: CREATE HASH  |  1: AUTO TEST" << endl;
+        cin >> selectWork;
+
+        switch(selectWork){
+            case 0:
+                test_one_hash();
+                break;
+            case 1:
+                auto_test();
+                break;
+
+            default:
+                break;
+        }
+    }
 
     return 0;
-}
+};
