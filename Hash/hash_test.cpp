@@ -5,34 +5,37 @@
 using namespace std;
 
 string get_random_string(){
-    string str;
+    
+    string str = "";
+    /*
     int len = 1; //rand() % 5;
     for (size_t i = 0; i < len; ++i) {
          int randomChar = rand()%(26+26+10);
          if (randomChar < 26)
-             str[i] = 'a' + randomChar;
+             str.append('a' + randomChar);
          else if (randomChar < 26+26)
-             str[i] = 'A' + randomChar - 26;
+             str.append('A' + (randomChar - 26));
          else
-             str[i] = '0' + randomChar - 26 - 26;
+             str.append('0' + (randomChar - 26 - 26));
      }
+     */
      return str;
 }
 
 void multi_puts(CustomHash * hashtable, unsigned int test_count){
     clock_t start, end;
-
+    
     start = clock();
     for( unsigned int i=0 ; i < test_count ; i++){
         try{
-            hashtable->put(get_random_string(), rand());
+            hashtable->put(rand(), rand());
         } catch(char const* error) {
             cout << error << endl;
             break;
         }
     };
     end = clock();
-    
+    cout << get_random_string() << endl;
     cout << "for " << test_count << " puts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s / conflict: " << hashtable->get_conflict_count()  << " / rehash:" << hashtable->get_rehash_count() << " / size:" << hashtable->get_size() << endl;
 }
 
@@ -190,7 +193,7 @@ void test_one_hash(){
             case 7:
                 cout << "size: " << hashtable->get_size() << endl;
                 cout << "element: " << hashtable->get_element_count() << endl;
-                cout << "conflict: " << hashtable->get_conflict() << endl;
+                cout << "conflict: " << hashtable->get_conflict_count() << endl;
                 cout << "rehash: " << hashtable->get_rehash_count() << endl;
 
             default:

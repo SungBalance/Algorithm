@@ -220,10 +220,10 @@ unsigned int CustomHash::quadratic_probing_remove(const string & key){
 // Collision:: Double_hashing
 unsigned int CustomHash::double_hashing_put(const string & key){
     unsigned int index_current = hash(key);
-    unsigned int prime = prior_prime(this->TABLE_SIZE);
+    unsigned int prime = this->LAST_PRIME;
     unsigned int step = prime - (str_to_int(key) % prime);
 
-    while(1){
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
 
         if (this->HASH_TABLE[index_current].is_using == false){ // get index for new one
             return index_current;
@@ -241,10 +241,10 @@ unsigned int CustomHash::double_hashing_put(const string & key){
 
 unsigned int CustomHash::double_hashing_get(const string & key){
     unsigned int index_current = hash(key);
-    unsigned int prime = prior_prime(this->TABLE_SIZE);
+    unsigned int prime = this->LAST_PRIME;
     unsigned int step = prime - (str_to_int(key) % prime);
 
-    while(1){
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
         if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
@@ -259,10 +259,10 @@ unsigned int CustomHash::double_hashing_get(const string & key){
 
 unsigned int CustomHash::double_hashing_remove(const string & key){
     unsigned int index_current = hash(key);
-    unsigned int prime = prior_prime(this->TABLE_SIZE);
+    unsigned int prime = this->LAST_PRIME;
     unsigned int step = prime - (str_to_int(key) % prime);
     
-    while(1){
+    for(int i=0 ; i<this->TABLE_SIZE ; i++){
         if(this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
@@ -276,7 +276,7 @@ unsigned int CustomHash::double_hashing_remove(const string & key){
 
 // Extends
 void CustomHash::extend(bool print_option){
-    unsigned int TABLE_SIZE_OLD = this->TABLE_SIZE;
+    this->LAST_PRIME = this->TABLE_SIZE;
     unsigned int VALUE_COUNT_OLD = this->VALUE_COUNT;
     bucket * HASH_TABLE_OLD = this->HASH_TABLE;
     
@@ -285,17 +285,17 @@ void CustomHash::extend(bool print_option){
     this->HASH_TABLE = new bucket[TABLE_SIZE];
     
     if(print_option){
-        cout << "REHASH:: from " << TABLE_SIZE_OLD << " to " << this->TABLE_SIZE << endl;
+        cout << "REHASH:: from " << this->LAST_PRIME << " to " << this->TABLE_SIZE << endl;
     }
     
-    for(signed int i=0 ; i<TABLE_SIZE_OLD ; i++){
+    for(signed int i=0 ; i<this->LAST_PRIME ; i++){
         if(HASH_TABLE_OLD[i].is_using){
             this->put(HASH_TABLE_OLD[i].key, HASH_TABLE_OLD[i].value);
         }
     };
     
     if(VALUE_COUNT_OLD != this->VALUE_COUNT){
-        this->TABLE_SIZE = TABLE_SIZE_OLD;
+        this->TABLE_SIZE = this->LAST_PRIME;
         this->VALUE_COUNT = VALUE_COUNT_OLD;
         this->HASH_TABLE = HASH_TABLE_OLD;
 
@@ -329,7 +329,7 @@ void CustomHash::check_and_extend(bool print_option){
 // Constructors
 CustomHash::CustomHash( const int Hashing, const int Collision){
     // initialize table
-    this->TABLE_SIZE = 7;
+    // this->TABLE_SIZE = 7;
     this->HASH_TABLE = new bucket[this->TABLE_SIZE];
 
     switch(Hashing){
@@ -534,7 +534,7 @@ bool CustomHash::contains_key(const string key){
 
 bool CustomHash::contains_key(const int key){
     try{
-        unsigned int index = (this->*GetPointer)(str_to_int(key)); 
+        unsigned int index = (this->*GetPointer)(to_string(key)); 
         return true;
     }
     catch(char const* error){

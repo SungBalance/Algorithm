@@ -27,7 +27,8 @@ class CustomHash{
         const int LIMIT_PERCENT{75};
         
         bucket * HASH_TABLE;
-        unsigned int TABLE_SIZE{8};
+        unsigned int TABLE_SIZE{7};
+        unsigned int LAST_PRIME{5};
         unsigned int VALUE_COUNT{0};
         unsigned int CONFLICT_COUNT{0};
         unsigned int REHASH_COUNT{0};
