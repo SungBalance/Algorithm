@@ -1,7 +1,40 @@
 #include <iostream>
+#include <cstdlib>
 #include "CustomHash.h"
 
 using namespace std;
+
+string get_random_string(){
+    string str;
+    int len = 1; //rand() % 5;
+    for (size_t i = 0; i < len; ++i) {
+         int randomChar = rand()%(26+26+10);
+         if (randomChar < 26)
+             str[i] = 'a' + randomChar;
+         else if (randomChar < 26+26)
+             str[i] = 'A' + randomChar - 26;
+         else
+             str[i] = '0' + randomChar - 26 - 26;
+     }
+     return str;
+}
+
+void multi_puts(CustomHash * hashtable, unsigned int test_count){
+    clock_t start, end;
+
+    start = clock();
+    for( unsigned int i=0 ; i < test_count ; i++){
+        try{
+            hashtable->put(get_random_string(), rand());
+        } catch(char const* error) {
+            cout << error << endl;
+            break;
+        }
+    };
+    end = clock();
+    
+    cout << "for " << test_count << " puts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s / conflict: " << hashtable->get_conflict_count()  << " / rehash:" << hashtable->get_rehash_count() << " / size:" << hashtable->get_size() << endl;
+}
 
 void test_one_hash(){
     cout << "-----------------------------------" << endl;
@@ -21,15 +54,17 @@ void test_one_hash(){
         cin >> selectProbe;
     }
 
-    CustomHash *hashtable = new CustomHash(0, 0);
+    CustomHash *hashtable = new CustomHash(0, selectProbe);
 
     cout << "-----------------------------------" << endl;
     cout << "HASH TABLE is created." << endl;
+    cout << "HASH: " << selectHash << "Probe: " << selectProbe << endl;
     cout << "-----------------------------------" << endl;
     cout << "" << endl;
     cout << "" << endl;
 
     int selectWork = -1;
+    
 
     while(1){
         selectWork = -1;
@@ -42,13 +77,14 @@ void test_one_hash(){
 
         cout << "-----------------------------------" << endl;
         cout << "작업을 선택하세요." << endl;
-        cout << "|  0: PUT  |  1: GET  |  2: REMOVE  |  3:LIST  |  4:CLEAR  |  5:TEST  |" << endl;
+        cout << "|  0: PUT  |  1: GET  |  2: REMOVE  |  3:LIST  |  4:CLEAR  |  5:TEST  |  6:MULTI_PUT  |  7: INFO  |" << endl;
         
         
         cin >> selectWork;
         
         string key_input = "";
         string value_input = "";
+        string stop = "";
 
         unsigned int test_count;
         clock_t start, end;
@@ -111,22 +147,51 @@ void test_one_hash(){
                 cout << "-----------------------------------" << endl;
                 cout << "== 5: TEST ==" << endl;
                 
-                cout << "TEST할 put 수를 입력하세요(단위:1000): ";
+                cout << "TEST할 put 수를 입력하세요: ";
 
                 cin >> test_count;
 
+                multi_puts(hashtable, test_count);
+                /*
                 start = clock();
                 
-                for( unsigned int i=0 ; i < test_count*1000 ; i++){
-                    hashtable->put(i, i, true);
+                for( unsigned int i=0 ; i < test_count ; i++){
+                    hashtable->put(rand(), rand(), true);
                 };
 
                 end = clock();
                 
-                cout << test_count*1000 << " puts with " << ((float) end - start)/CLOCKS_PER_SEC << "s" << endl;
-
+                cout << "for " << test_count << " puts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s / conflict: " << hashtable->get_conflict_count()  << " / rehash:" << hashtable->get_rehash_count() << " / size:" << hashtable->get_size() << endl;
+                */
                 cout << "== test completed ==" << endl;
                 break;
+
+            case 6:
+                cout << "press 0 to stop" << endl;
+                
+                while(1){
+                    try{
+                        hashtable->put(rand(), rand());
+                    } catch(char const* error) {
+                        cout << error << endl;
+                        break;
+                    }
+                    
+                    cout << "size: " << hashtable->get_size() << endl;
+                    cout << "element: " << hashtable->get_element_count() << endl;
+
+                    stop = cin.get();
+                    if(stop=="0"){
+                        break;
+                    }
+                }
+                break;
+
+            case 7:
+                cout << "size: " << hashtable->get_size() << endl;
+                cout << "element: " << hashtable->get_element_count() << endl;
+                cout << "conflict: " << hashtable->get_conflict() << endl;
+                cout << "rehash: " << hashtable->get_rehash_count() << endl;
 
             default:
                 cout << ":::ERROR::: -> WRONG JOB." << endl;
@@ -161,22 +226,15 @@ void auto_test(){
                 cout << "LINEAR PROBING" << endl;
                 break;        
         }
+        multi_puts(hashtable, test_count);
 
-        start = clock();
-                
-        for( unsigned int j=0 ; j < test_count ; j++){
-            hashtable->put(j, j);
-        };
-
-        end = clock();
-        cout << "for " << test_count << " puts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s" << endl;
-        
         delete hashtable;
     }
 }
 
 int main(){
 
+    srand(static_cast<unsigned int>(time(0)));
     int selectWork = -1;
 
     while(selectWork != 0 && selectWork != 1){
