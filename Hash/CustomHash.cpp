@@ -202,7 +202,7 @@ unsigned int CustomHash::quadratic_probing_get(const string & key){
         index_current %= this->TABLE_SIZE;
     }
 
-    throw "키 값을 찾을 수 없습니다.";
+    throw "값을 찾을 수 없습니다.";
     return 0;
 };
 
@@ -266,7 +266,7 @@ unsigned int CustomHash::double_hashing_get(const string & key){
         index_current %= this->TABLE_SIZE;
     }
 
-    throw "키 값을 찾을 수 없습니다.";
+    throw "값을 찾을 수 없습니다.";
     return 0;
 };
 
@@ -555,7 +555,7 @@ bool CustomHash::contains_key(const string key){
 
 bool CustomHash::contains_key(const int key){
     try{
-        unsigned int index = (this->*GetPointer)(to_string(key)); 
+        unsigned int index = (this->*GetPointer)(to_string(key));
         return true;
     }
     catch(char const* error){
@@ -570,6 +570,13 @@ bool CustomHash::contains_value(const string value){
             return true;
         }
     };
+    return false;
+}
+
+bool CustomHash::is_empty(){
+    if(this->VALUE_COUNT > 0){
+        return true;
+    }
     return false;
 }
 

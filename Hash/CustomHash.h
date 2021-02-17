@@ -24,6 +24,7 @@ class CustomHash{
     private:
         // Knuth, "Sorting and Searching", v. 3 of "The Art of Cominserter Programming").
         const float CONST_MULTIPLICATION_METHOD{0.6180339887}; // (sqrt(5)-1)/2
+        
         const int LIMIT_PERCENT{75};
         
         bucket * HASH_TABLE;
@@ -32,7 +33,6 @@ class CustomHash{
         unsigned int VALUE_COUNT{0};
         unsigned int CONFLICT_COUNT{0};
         unsigned int REHASH_COUNT{0};
-        // bucket HASH_TABLE[TABLE_SIZE]; // array<bucket, 256> HASH_TABLE{};
 
         vector<unsigned int> INDEX_LIST;
 
@@ -102,6 +102,7 @@ class CustomHash{
         bool contains_key(const string key);
         bool contains_key(const int key);
         bool contains_value(const string value);
+        bool is_empty();
 
         void print_list();
         void print_list_all();

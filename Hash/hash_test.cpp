@@ -40,10 +40,10 @@ void multi_inserts(CustomHash * hashtable, unsigned int test_count, vector<unsig
         }
     };
     end = clock();
-    cout << "for " << test_count << " inserts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s / conflict: " << hashtable->get_conflict_count()  << " / rehash:" << hashtable->get_rehash_count() << " / size:" << hashtable->get_size() << endl;
+    cout << "inserts:: for " << test_count << " inserts / node: " << hashtable->get_element_count() << " / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s / conflict: " << hashtable->get_conflict_count()  << " / rehash:" << hashtable->get_rehash_count() << " / size:" << hashtable->get_size() << endl;
 }
 
-void get_test(CustomHash * hashtable, vector<unsigned int> & key_list){
+void multi_searches(CustomHash * hashtable, vector<unsigned int> & key_list){
     clock_t start, end;
     unsigned int key;
     
@@ -58,8 +58,23 @@ void get_test(CustomHash * hashtable, vector<unsigned int> & key_list){
     };
     end = clock();
     cout << "searches:: for " << key_list.size() << " keys / time: " << ((float) end - start)/CLOCKS_PER_SEC << endl;
+}
 
-
+void multi_removes(CustomHash * hashtable, vector<unsigned int> & key_list){
+    clock_t start, end;
+    unsigned int key;
+    
+    start = clock();
+    for( unsigned int i=0 ; i < key_list.size() ; i++){
+        try{
+            hashtable->remove(key_list[i]);
+        } catch(char const* error) {
+            cout << error << endl;
+            break;
+        }
+    };
+    end = clock();
+    cout << "removes:: for " << key_list.size() << " keys / time: " << ((float) end - start)/CLOCKS_PER_SEC << endl;
 }
 
 void auto_test(){
@@ -78,7 +93,6 @@ void auto_test(){
         switch(i){
             case 1: // QUADRATIC
                 cout << "QUADRATIC PROBING" << endl;
-                
                 break;
 
             case 2: // DOUBLE HASHING
@@ -94,15 +108,15 @@ void auto_test(){
 
         switch(i){
             case 1: // QUADRATIC
-                get_test(hashtable, key_list);
+                multi_searches(hashtable, key_list);
                 break;
 
             case 2: // DOUBLE HASHING
-                get_test(hashtable, key_list);
+                multi_searches(hashtable, key_list);
                 break;
 
             default: // LINEAR
-                get_test(hashtable, key_list);
+                multi_searches(hashtable, key_list);
                 break;        
         }
         
@@ -152,7 +166,10 @@ void test_one_hash(){
         
         cout << "size: " << hashtable->get_size() << endl;
         cout << "element: " << hashtable->get_element_count() << endl;
-        //hashtable->print_list_all();
+        if(hashtable->get_element_count() < 10){
+            hashtable->print_list_all();
+        }
+        
 
 
         cout << "-----------------------------------" << endl;
