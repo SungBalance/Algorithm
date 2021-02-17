@@ -130,6 +130,9 @@ unsigned int CustomHash::linear_probing_get(const string & key){
         if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
+        if(this->HASH_TABLE[index_current].deleted == false && this->HASH_TABLE[index_current].is_using == false){
+            throw "값을 찾을 수 없습니다.";
+        }
 
         index_current += 1;
         index_current %= this->TABLE_SIZE;
@@ -145,6 +148,9 @@ unsigned int CustomHash::linear_probing_remove(const string & key){
 
         if(this->HASH_TABLE[index_current].key == key){
             return index_current;
+        }
+        if(this->HASH_TABLE[index_current].deleted == false && this->HASH_TABLE[index_current].is_using == false){
+            throw "값을 찾을 수 없습니다.";
         }
 
         index_current += 1;
@@ -186,8 +192,9 @@ unsigned int CustomHash::quadratic_probing_get(const string & key){
         
         if(this->HASH_TABLE[index_current].is_using && this->HASH_TABLE[index_current].key == key){
             return index_current;
-        } else if(this->HASH_TABLE[index_current].is_using == false && this->HASH_TABLE[index_current].deleted == false){
-            break;
+        }
+        if(this->HASH_TABLE[index_current].deleted == false && this->HASH_TABLE[index_current].is_using == false){
+            throw "값을 찾을 수 없습니다.";
         }
         
         step += 1;
@@ -207,6 +214,9 @@ unsigned int CustomHash::quadratic_probing_remove(const string & key){
         
         if(this->HASH_TABLE[index_current].key == key){
             return index_current;
+        }
+        if(this->HASH_TABLE[index_current].deleted == false && this->HASH_TABLE[index_current].is_using == false){
+            throw "값을 찾을 수 없습니다.";
         }
 
         step += 1;
@@ -248,6 +258,9 @@ unsigned int CustomHash::double_hashing_get(const string & key){
         if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
+        if(this->HASH_TABLE[index_current].deleted == false && this->HASH_TABLE[index_current].is_using == false){
+            throw "값을 찾을 수 없습니다.";
+        }
 
         index_current += step;
         index_current %= this->TABLE_SIZE;
@@ -266,6 +279,9 @@ unsigned int CustomHash::double_hashing_remove(const string & key){
         if(this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
+        if(this->HASH_TABLE[index_current].deleted == false && this->HASH_TABLE[index_current].is_using == false){
+            throw "값을 찾을 수 없습니다.";
+        }
 
         index_current += step;
         index_current %= this->TABLE_SIZE;
@@ -274,14 +290,15 @@ unsigned int CustomHash::double_hashing_remove(const string & key){
     return 0;
 };
 
-// Extends
-void CustomHash::extend(bool print_option){
+// Rehash
+void CustomHash::rehash(bool print_option){
     this->LAST_PRIME = this->TABLE_SIZE;
     unsigned int VALUE_COUNT_OLD = this->VALUE_COUNT;
     bucket * HASH_TABLE_OLD = this->HASH_TABLE;
     
     this->TABLE_SIZE = prior_prime(2*this->TABLE_SIZE);
     this->VALUE_COUNT = 0;
+    this->CONFLICT_COUNT = 0;
     this->HASH_TABLE = new bucket[TABLE_SIZE];
     
     if(print_option){
@@ -299,21 +316,21 @@ void CustomHash::extend(bool print_option){
         this->VALUE_COUNT = VALUE_COUNT_OLD;
         this->HASH_TABLE = HASH_TABLE_OLD;
 
-        throw "FAIL!!::EXTEND";
+        throw "FAIL!!::rehash";
     }
 
     delete[] HASH_TABLE_OLD;
 };
 
-void CustomHash::check_and_extend(bool print_option){
+void CustomHash::check_and_rehash(bool print_option){
     if (int(100*this->VALUE_COUNT/this->TABLE_SIZE) >= this->LIMIT_PERCENT){
-        // this->extend();
+        // this->rehash();
         
         try{
             this->REHASH_COUNT += 1;
-            this->extend(print_option);
+            this->rehash(print_option);
         } catch (char const* error){
-            cout << "ERROR::EXTEND:: " << error << endl;
+            cout << "ERROR::rehash:: " << error << endl;
         }
     }
 };
@@ -376,7 +393,7 @@ CustomHash::~CustomHash(){
 
 
 // PUT
-CustomHash & CustomHash::put(const string key, string value, bool extend_print){
+CustomHash & CustomHash::put(const string key, string value, bool rehash_print){
     try{
         unsigned int index = (this->*PutPointer)(key); // get index to put data
         
@@ -388,7 +405,7 @@ CustomHash & CustomHash::put(const string key, string value, bool extend_print){
         HASH_TABLE[index].key = key;
         HASH_TABLE[index].value = value;
 
-        check_and_extend(extend_print);
+        check_and_rehash(rehash_print);
 
     } catch(char const* error) {
         cout << "ERROR::put:: " << error << endl;
@@ -398,21 +415,21 @@ CustomHash & CustomHash::put(const string key, string value, bool extend_print){
     return * this;
 };
 
-CustomHash & CustomHash::put(const string key, int value, bool extend_print){
+CustomHash & CustomHash::put(const string key, int value, bool rehash_print){
     string value_string = to_string(value);
-    return this->put(key, value_string, extend_print);
+    return this->put(key, value_string, rehash_print);
 };
 
-CustomHash & CustomHash::put(const int key, int value, bool extend_print){
+CustomHash & CustomHash::put(const int key, int value, bool rehash_print){
     string key_string = to_string(key);
     string value_string = to_string(value);
-    return this->put(key_string, value_string, extend_print);
+    return this->put(key_string, value_string, rehash_print);
 };
 
 
-CustomHash & CustomHash::put(const int key, string value, bool extend_print){
+CustomHash & CustomHash::put(const int key, string value, bool rehash_print){
     string key_string = to_string(key);
-    return this->put(key_string, value, extend_print);
+    return this->put(key_string, value, rehash_print);
 };
 
 // GET

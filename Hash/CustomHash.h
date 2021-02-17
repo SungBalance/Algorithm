@@ -63,9 +63,9 @@ class CustomHash{
         unsigned int double_hashing_get(const string & key);
         unsigned int double_hashing_remove(const string & key);
 
-        // Extends
-        void extend(bool print_option = false);
-        void check_and_extend(bool print_option = false);
+        // rehashs
+        void rehash(bool print_option = false);
+        void check_and_rehash(bool print_option = false);
 
     public:
         // CONSTRUCTOR
@@ -73,10 +73,10 @@ class CustomHash{
         ~CustomHash();
 
         // PUT
-        CustomHash & put(const string key, const string value, bool extend_print = false);
-        CustomHash & put(const string key, const int value, bool extend_print = false);
-        CustomHash & put(const int key, const int value, bool extend_print = false);
-        CustomHash & put(const int key, const string value, bool extend_print = false);
+        CustomHash & put(const string key, const string value, bool rehash_print = false);
+        CustomHash & put(const string key, const int value, bool rehash_print = false);
+        CustomHash & put(const int key, const int value, bool rehash_print = false);
+        CustomHash & put(const int key, const string value, bool rehash_print = false);
 
         // GET
         string get(const string key);
