@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <vector>
 #include "CustomHash.h"
 
 using namespace std;
@@ -22,32 +23,108 @@ string get_random_string(){
      return str;
 }
 
-void multi_puts(CustomHash * hashtable, unsigned int test_count){
+
+void multi_inserts(CustomHash * hashtable, unsigned int test_count, vector<unsigned int> & key_list){
     clock_t start, end;
+    unsigned int key;
     
     start = clock();
     for( unsigned int i=0 ; i < test_count ; i++){
         try{
-            hashtable->put(rand(), rand());
+            key = rand();
+            key_list.push_back(key);
+            hashtable->insert(key, rand());
         } catch(char const* error) {
             cout << error << endl;
             break;
         }
     };
     end = clock();
-    cout << get_random_string() << endl;
-    cout << "for " << test_count << " puts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s / conflict: " << hashtable->get_conflict_count()  << " / rehash:" << hashtable->get_rehash_count() << " / size:" << hashtable->get_size() << endl;
+    cout << "for " << test_count << " inserts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s / conflict: " << hashtable->get_conflict_count()  << " / rehash:" << hashtable->get_rehash_count() << " / size:" << hashtable->get_size() << endl;
 }
+
+void get_test(CustomHash * hashtable, vector<unsigned int> & key_list){
+    clock_t start, end;
+    unsigned int key;
+    
+    start = clock();
+    for( unsigned int i=0 ; i < key_list.size() ; i++){
+        try{
+            hashtable->get(key_list[i]);
+        } catch(char const* error) {
+            cout << error << endl;
+            break;
+        }
+    };
+    end = clock();
+    cout << "searches:: for " << key_list.size() << " keys / time: " << ((float) end - start)/CLOCKS_PER_SEC << endl;
+
+
+}
+
+void auto_test(){
+
+    vector<unsigned int> key_list;
+    int test_count;
+
+    cout << "TEST할 insert 수를 입력하세요: ";
+    cin >> test_count;
+
+    
+    for(int i=0 ; i<=2 ; i++){
+        CustomHash *hashtable = new CustomHash(0, i);
+        cout << "" << endl;
+        cout << "" << endl;
+        switch(i){
+            case 1: // QUADRATIC
+                cout << "QUADRATIC PROBING" << endl;
+                
+                break;
+
+            case 2: // DOUBLE HASHING
+                cout << "DOUBLE HASHING" << endl;
+                break;
+
+            default: // LINEAR
+                cout << "LINEAR PROBING" << endl;
+                break;        
+        }
+        
+        multi_inserts(hashtable, test_count, key_list);
+
+        switch(i){
+            case 1: // QUADRATIC
+                get_test(hashtable, key_list);
+                break;
+
+            case 2: // DOUBLE HASHING
+                get_test(hashtable, key_list);
+                break;
+
+            default: // LINEAR
+                get_test(hashtable, key_list);
+                break;        
+        }
+        
+        delete hashtable;
+        key_list.clear();
+    }
+
+}
+
 
 void test_one_hash(){
     cout << "-----------------------------------" << endl;
     
-    int selectHash = -1;
+    
+    int selectHash = 0;
+    /*
     while(selectHash != 0 && selectHash != 1){
         cout << "HASH 종류를 선택하세요." << endl;
         cout << "0: DIVISION(default)  |  1: MULTIPLICATION" << endl;
         cin >> selectHash;
     }
+    */
     
     int selectProbe = -1;
     while(selectProbe != 0 && selectProbe != 1 && selectProbe != 2){
@@ -80,7 +157,7 @@ void test_one_hash(){
 
         cout << "-----------------------------------" << endl;
         cout << "작업을 선택하세요." << endl;
-        cout << "|  0: PUT  |  1: GET  |  2: REMOVE  |  3:LIST  |  4:CLEAR  |  5:TEST  |  6:MULTI_PUT  |  7: INFO  |" << endl;
+        cout << "|  0: insert  |  1: GET  |  2: REMOVE  |  3:LIST  |  4:CLEAR  |  5:TEST  |  6:MULTI_insert  |  7: INFO  |" << endl;
         
         
         cin >> selectWork;
@@ -88,6 +165,7 @@ void test_one_hash(){
         string key_input = "";
         string value_input = "";
         string stop = "";
+        vector<unsigned int> key_list;
 
         unsigned int test_count;
         clock_t start, end;
@@ -95,7 +173,7 @@ void test_one_hash(){
         switch(selectWork){
             case 0:
                 cout << "-----------------------------------" << endl;
-                //cout << "== 0: PUT ==" << endl;
+                //cout << "== 0: insert ==" << endl;
                 value_input = "";
 
                 cout << "KEY를 입력하세요: ";
@@ -103,8 +181,8 @@ void test_one_hash(){
                 cout << "VALUE를 입력하세요: ";
                 cin >> value_input;
 
-                hashtable->put(key_input, value_input);
-                cout << "== put completed ==" << endl;
+                hashtable->insert(key_input, value_input);
+                cout << "== insert completed ==" << endl;
                 break;
 
             case 1:
@@ -150,21 +228,21 @@ void test_one_hash(){
                 cout << "-----------------------------------" << endl;
                 cout << "== 5: TEST ==" << endl;
                 
-                cout << "TEST할 put 수를 입력하세요: ";
+                cout << "TEST할 insert 수를 입력하세요: ";
 
                 cin >> test_count;
 
-                multi_puts(hashtable, test_count);
+                multi_inserts(hashtable, test_count, key_list);
                 /*
                 start = clock();
                 
                 for( unsigned int i=0 ; i < test_count ; i++){
-                    hashtable->put(rand(), rand(), true);
+                    hashtable->insert(rand(), rand(), true);
                 };
 
                 end = clock();
                 
-                cout << "for " << test_count << " puts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s / conflict: " << hashtable->get_conflict_count()  << " / rehash:" << hashtable->get_rehash_count() << " / size:" << hashtable->get_size() << endl;
+                cout << "for " << test_count << " inserts / time: " << ((float) end - start)/CLOCKS_PER_SEC << "s / conflict: " << hashtable->get_conflict_count()  << " / rehash:" << hashtable->get_rehash_count() << " / size:" << hashtable->get_size() << endl;
                 */
                 cout << "== test completed ==" << endl;
                 break;
@@ -174,7 +252,7 @@ void test_one_hash(){
                 
                 while(1){
                     try{
-                        hashtable->put(rand(), rand());
+                        hashtable->insert(rand(), rand());
                     } catch(char const* error) {
                         cout << error << endl;
                         break;
@@ -195,6 +273,7 @@ void test_one_hash(){
                 cout << "element: " << hashtable->get_element_count() << endl;
                 cout << "conflict: " << hashtable->get_conflict_count() << endl;
                 cout << "rehash: " << hashtable->get_rehash_count() << endl;
+                break;
 
             default:
                 cout << ":::ERROR::: -> WRONG JOB." << endl;
@@ -204,36 +283,7 @@ void test_one_hash(){
     };
 }
 
-void auto_test(){
 
-    int test_count;
-    clock_t start, end;
-
-    cout << "TEST할 put 수를 입력하세요: ";
-    cin >> test_count;
-
-    for(int i=0 ; i<=2 ; i++){
-        CustomHash *hashtable = new CustomHash(0, i);
-        cout << "" << endl;
-        cout << "" << endl;
-        switch(i){
-            case 1: // QUADRATIC
-                cout << "QUADRATIC PROBING" << endl;
-                break;
-
-            case 2: // DOUBLE HASHING
-                cout << "DOUBLE HASHING" << endl;
-                break;
-
-            default: // LINEAR
-                cout << "LINEAR PROBING" << endl;
-                break;        
-        }
-        multi_puts(hashtable, test_count);
-
-        delete hashtable;
-    }
-}
 
 int main(){
 

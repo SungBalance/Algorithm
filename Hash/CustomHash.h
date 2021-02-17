@@ -22,7 +22,7 @@ struct bucket{
 class CustomHash{
 
     private:
-        // Knuth, "Sorting and Searching", v. 3 of "The Art of Computer Programming").
+        // Knuth, "Sorting and Searching", v. 3 of "The Art of Cominserter Programming").
         const float CONST_MULTIPLICATION_METHOD{0.6180339887}; // (sqrt(5)-1)/2
         const int LIMIT_PERCENT{75};
         
@@ -38,7 +38,7 @@ class CustomHash{
 
         // FUNCTION POINTERS
         unsigned int (CustomHash::*HasingPointer)(const unsigned int &, const unsigned int &);
-        unsigned int (CustomHash::*PutPointer)(const string &);
+        unsigned int (CustomHash::*insertPointer)(const string &);
         unsigned int (CustomHash::*GetPointer)(const string &);
         unsigned int (CustomHash::*RemovePointer)(const string &);
 
@@ -51,15 +51,15 @@ class CustomHash{
 
 
         // get index to work per Collision methods
-        unsigned int linear_probing_put(const string & key);
+        unsigned int linear_probing_insert(const string & key);
         unsigned int linear_probing_get(const string & key);
         unsigned int linear_probing_remove(const string & key);
 
-        unsigned int quadratic_probing_put(const string & key);
+        unsigned int quadratic_probing_insert(const string & key);
         unsigned int quadratic_probing_get(const string & key);
         unsigned int quadratic_probing_remove(const string & key);
 
-        unsigned int double_hashing_put(const string & key);
+        unsigned int double_hashing_insert(const string & key);
         unsigned int double_hashing_get(const string & key);
         unsigned int double_hashing_remove(const string & key);
 
@@ -72,11 +72,11 @@ class CustomHash{
         CustomHash(const int Hashing = 0, const int Collision = 0);
         ~CustomHash();
 
-        // PUT
-        CustomHash & put(const string key, const string value, bool rehash_print = false);
-        CustomHash & put(const string key, const int value, bool rehash_print = false);
-        CustomHash & put(const int key, const int value, bool rehash_print = false);
-        CustomHash & put(const int key, const string value, bool rehash_print = false);
+        // insert
+        CustomHash & insert(const string key, const string value, bool rehash_print = false);
+        CustomHash & insert(const string key, const int value, bool rehash_print = false);
+        CustomHash & insert(const int key, const int value, bool rehash_print = false);
+        CustomHash & insert(const int key, const string value, bool rehash_print = false);
 
         // GET
         string get(const string key);

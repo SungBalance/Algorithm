@@ -79,7 +79,7 @@ unsigned int CustomHash::division_method(const unsigned int & key_int, const uns
 };
 
 unsigned int CustomHash::multiplication_method(const unsigned int & key_int, const unsigned int & size){
-    // Knuth, "Sorting and Searching", v. 3 of "The Art of Computer Programming")
+    // Knuth, "Sorting and Searching", v. 3 of "The Art of Cominserter Programming")
     return 0; // int( size * ( (key_int * this->CONST_MULTIPLICATION_METHOD) % 1 ) );
 };
 
@@ -104,7 +104,7 @@ unsigned int CustomHash::hash(const string & key, const unsigned int size){
 
 
 // Collision:: Linear_probing
-unsigned int CustomHash::linear_probing_put(const string & key){
+unsigned int CustomHash::linear_probing_insert(const string & key){
     unsigned int index_current = hash(key);
 
     for(int i=0 ; i<this->TABLE_SIZE ; i++){
@@ -162,7 +162,7 @@ unsigned int CustomHash::linear_probing_remove(const string & key){
 
 
 // Collision:: Quadratic_probing
-unsigned int CustomHash::quadratic_probing_put(const string & key){
+unsigned int CustomHash::quadratic_probing_insert(const string & key){
     unsigned int index_current = hash(key);
     unsigned int step = 0;
 
@@ -228,7 +228,7 @@ unsigned int CustomHash::quadratic_probing_remove(const string & key){
 };
 
 // Collision:: Double_hashing
-unsigned int CustomHash::double_hashing_put(const string & key){
+unsigned int CustomHash::double_hashing_insert(const string & key){
     unsigned int index_current = hash(key);
     unsigned int prime = this->LAST_PRIME;
     unsigned int step = prime - (str_to_int(key) % prime);
@@ -254,7 +254,7 @@ unsigned int CustomHash::double_hashing_get(const string & key){
     unsigned int prime = this->LAST_PRIME;
     unsigned int step = prime - (str_to_int(key) % prime);
 
-    for(int i=0 ; i<this->TABLE_SIZE ; i++){
+    while(1){
         if(this->HASH_TABLE[index_current].is_using == true && this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
@@ -275,7 +275,7 @@ unsigned int CustomHash::double_hashing_remove(const string & key){
     unsigned int prime = this->LAST_PRIME;
     unsigned int step = prime - (str_to_int(key) % prime);
     
-    for(int i=0 ; i<this->TABLE_SIZE ; i++){
+    while(1){
         if(this->HASH_TABLE[index_current].key == key){
             return index_current;
         }
@@ -307,7 +307,7 @@ void CustomHash::rehash(bool print_option){
     
     for(signed int i=0 ; i<this->LAST_PRIME ; i++){
         if(HASH_TABLE_OLD[i].is_using){
-            this->put(HASH_TABLE_OLD[i].key, HASH_TABLE_OLD[i].value);
+            this->insert(HASH_TABLE_OLD[i].key, HASH_TABLE_OLD[i].value);
         }
     };
     
@@ -364,21 +364,21 @@ CustomHash::CustomHash( const int Hashing, const int Collision){
     switch(Collision){
 
         case 1: // QUADRATIC
-            this->PutPointer = &CustomHash::quadratic_probing_put;
+            this->insertPointer = &CustomHash::quadratic_probing_insert;
             this->GetPointer = &CustomHash::quadratic_probing_get;
             this->RemovePointer = &CustomHash::quadratic_probing_remove;
             // cout << "QUADRATIC DONE" << endl;
             break;
 
         case 2: // DOUBLE HASHING
-            this->PutPointer = &CustomHash::double_hashing_put;
+            this->insertPointer = &CustomHash::double_hashing_insert;
             this->GetPointer = &CustomHash::double_hashing_get;
             this->RemovePointer = &CustomHash::double_hashing_remove;
             // cout << "DOUBLE HASHING DONE" << endl;
             break;
 
         default: // LINEAR
-            this->PutPointer = &CustomHash::linear_probing_put;
+            this->insertPointer = &CustomHash::linear_probing_insert;
             this->GetPointer = &CustomHash::linear_probing_get;
             this->RemovePointer = &CustomHash::linear_probing_remove;
             // cout << "LINEAR DONE" << endl;
@@ -392,10 +392,10 @@ CustomHash::~CustomHash(){
 }
 
 
-// PUT
-CustomHash & CustomHash::put(const string key, string value, bool rehash_print){
+// insert
+CustomHash & CustomHash::insert(const string key, string value, bool rehash_print){
     try{
-        unsigned int index = (this->*PutPointer)(key); // get index to put data
+        unsigned int index = (this->*insertPointer)(key); // get index to insert data
         
         if(HASH_TABLE[index].key != key){
             this->VALUE_COUNT += 1;
@@ -408,28 +408,28 @@ CustomHash & CustomHash::put(const string key, string value, bool rehash_print){
         check_and_rehash(rehash_print);
 
     } catch(char const* error) {
-        cout << "ERROR::put:: " << error << endl;
+        cout << "ERROR::insert:: " << error << endl;
         throw "ERROR";
     }
     
     return * this;
 };
 
-CustomHash & CustomHash::put(const string key, int value, bool rehash_print){
+CustomHash & CustomHash::insert(const string key, int value, bool rehash_print){
     string value_string = to_string(value);
-    return this->put(key, value_string, rehash_print);
+    return this->insert(key, value_string, rehash_print);
 };
 
-CustomHash & CustomHash::put(const int key, int value, bool rehash_print){
+CustomHash & CustomHash::insert(const int key, int value, bool rehash_print){
     string key_string = to_string(key);
     string value_string = to_string(value);
-    return this->put(key_string, value_string, rehash_print);
+    return this->insert(key_string, value_string, rehash_print);
 };
 
 
-CustomHash & CustomHash::put(const int key, string value, bool rehash_print){
+CustomHash & CustomHash::insert(const int key, string value, bool rehash_print){
     string key_string = to_string(key);
-    return this->put(key_string, value, rehash_print);
+    return this->insert(key_string, value, rehash_print);
 };
 
 // GET
@@ -491,8 +491,12 @@ CustomHash & CustomHash::remove(const int key, const string value){
 // CLEAR
 void CustomHash::clear(){
     delete[] this->HASH_TABLE;
+    this->TABLE_SIZE = 7;
+    this->LAST_PRIME = 5;
     this->VALUE_COUNT = 0;
-    this->TABLE_SIZE = 8;
+    this->CONFLICT_COUNT = 0;
+    this->REHASH_COUNT = 0;
+    
     this->HASH_TABLE = new bucket[TABLE_SIZE];
 };
 
