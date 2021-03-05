@@ -162,7 +162,7 @@ void test_one_hash(){
 
     while(1){
         selectWork = -1;
-        cout << "\n\n\n\n\n\n\n\n";
+        cout << "\n\n\n\n";
         
         cout << "size: " << hashtable->get_size() << endl;
         cout << "element: " << hashtable->get_element_count() << endl;
@@ -266,8 +266,9 @@ void test_one_hash(){
 
             case 6:
                 cout << "press 0 to stop" << endl;
-                
+                stop = "";
                 while(1){
+                    
                     try{
                         hashtable->insert(rand(), rand());
                     } catch(char const* error) {
@@ -279,6 +280,7 @@ void test_one_hash(){
                     cout << "element: " << hashtable->get_element_count() << endl;
 
                     stop = cin.get();
+
                     if(stop=="0"){
                         break;
                     }

@@ -166,7 +166,7 @@ unsigned int CustomHash::quadratic_probing_insert(const string & key){
     unsigned int index_current = hash(key);
     unsigned int step = 0;
 
-    while(1){
+    while(1){ // 빈자리 rehashing
         
         if(this->HASH_TABLE[index_current].is_using == false){ // get index for new one
             return index_current;
@@ -399,7 +399,7 @@ CustomHash & CustomHash::insert(const string key, string value, bool rehash_prin
         
         if(HASH_TABLE[index].key != key){
             this->VALUE_COUNT += 1;
-        }    
+        }
         
         HASH_TABLE[index].is_using = true;
         HASH_TABLE[index].key = key;
@@ -451,21 +451,31 @@ string CustomHash::get(const int key){
 
 // REMOVE
 CustomHash & CustomHash::remove(const string key){
-    unsigned int index = (this->*RemovePointer)(key); // get index to remove data
+    try{
+        unsigned int index = (this->*GetPointer)(key); // get index to remove data
 
-    this->HASH_TABLE[index].is_using = false; // this means remove
-    this->VALUE_COUNT -= 1;
+        this->HASH_TABLE[index].is_using = false; // this means remove
+        this->VALUE_COUNT -= 1;
+    }
+    catch(char const* error){
+        cout << "ERROR::REMOVE:: " << error << endl;
+    }
 
     return * this;
 };
 
 CustomHash & CustomHash::remove(const string key, const string value){
-    unsigned int index = (this->*RemovePointer)(key); // get index to remove data
+    try{
+        unsigned int index = (this->*RemovePointer)(key); // get index to remove data
 
-    // check if values equal
-    if(this->HASH_TABLE[index].value == value){
-        this->HASH_TABLE[index].is_using = false;
-        this->VALUE_COUNT -= 1;
+        // check if values equal
+        if(this->HASH_TABLE[index].value == value){
+            this->HASH_TABLE[index].is_using = false;
+            this->VALUE_COUNT -= 1;
+        }
+    }
+    catch(char const* error){
+        cout << "ERROR::REMOVE:: " << error << endl;
     }
 
     return * this;
